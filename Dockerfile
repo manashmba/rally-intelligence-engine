@@ -19,5 +19,8 @@ COPY . .
 # Create directories
 RUN mkdir -p /app/reports /app/logs /tmp/rie_charts
 
-# Default command
-CMD ["python", "-m", "engine.orchestrator", "start", "--mode", "pre-rally"]
+# Expose port
+EXPOSE ${PORT:-8050}
+
+# Default command — runs the dashboard
+CMD ["python", "-m", "engine.dashboard.server"]
