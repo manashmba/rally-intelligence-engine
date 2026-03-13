@@ -908,6 +908,25 @@ def create_app(kpi_store: list = None):
             ], style=style))
         results.append(alert_items)
 
+        expected = len(outputs)
+        actual = len(results)
+        if actual != expected:
+            logger.error(f"Output mismatch: got {actual}, expected {expected}")
+            # Pad or trim to match
+            if actual < expected:
+                empty_fig = __import__('plotly.graph_objects', fromlist=['graph_objects']).Figure()
+                empty_fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+                for i in range(actual, expected):
+                    o = outputs[i]
+                    if o.component_property == "figure":
+                        results.append(empty_fig)
+                    elif o.component_property == "style":
+                        results.append({})
+                    else:
+                        results.append("—")
+            else:
+                results = results[:expected]
+
         return tuple(results)
 
     return app
