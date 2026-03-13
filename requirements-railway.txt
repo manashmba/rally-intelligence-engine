@@ -1,0 +1,23 @@
+# ─── JanPulse AI ─── Dashboard-only dependencies for Railway ───
+# Core
+python-dotenv>=1.0
+pydantic>=2.6
+loguru>=0.7
+
+# Dashboard
+dash>=2.16
+dash-bootstrap-components>=1.5
+plotly>=5.19
+flask>=3.0
+
+# Data
+pandas>=2.2
+numpy>=1.26
+
+# Reporting
+python-docx>=1.1
+
+# Utilities
+python-dateutil>=2.9
+pytz>=2024.1
+requests>=2.31

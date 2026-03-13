@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-railway.txt .
+RUN pip install --no-cache-dir -r requirements-railway.txt
 
 # Application code
 COPY . .
@@ -20,4 +20,5 @@ COPY . .
 RUN mkdir -p /app/reports /app/logs /tmp/rie_charts
 
 # Default command
-CMD ["python", "-m", "engine.orchestrator", "start", "--mode", "pre-rally"]
+ENV PYTHONPATH=/app
+CMD ["python", "engine/dashboard/server.py"]

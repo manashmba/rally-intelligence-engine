@@ -1052,7 +1052,7 @@ def run_server(port=8050, debug=False):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--port", type=int, default=8050)
+    parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8050)))
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
     run_server(port=args.port, debug=args.debug)
