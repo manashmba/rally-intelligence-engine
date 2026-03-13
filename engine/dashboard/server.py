@@ -3,7 +3,7 @@ JanPulse AI — Dashboard Server
 Real-time web dashboard using Dash/Plotly for the command centre view.
 """
 import os, sys, random
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from loguru import logger
 
 try:
@@ -26,7 +26,6 @@ from engine.dashboard.demo_data import (
     demo_ht_stance, demo_bot_activity, demo_regional_bengali,
     ADV_COLORS, ADV_EMOJIS, PARTY_COLORS, PARTY_BADGE, PLAT_COLORS,
     BOT_INCLINATION_COLORS, BOT_SENTIMENT_COLORS, BENGALI_HASHTAG_COLORS,
-    IST, _seeded_random,
 )
 
 # ─── Chart style constants ────────────────────────────────────────────
@@ -147,11 +146,9 @@ def create_app(kpi_store: list = None):
 
     @app.callback(outputs, [Input("refresh-interval", "n_intervals")])
     def update_dashboard(n):
-        now_ist = datetime.now(IST)
-        now_str = now_ist.strftime("%d %b %Y  •  %I:%M:%S %p IST")
+        now_str = datetime.utcnow().strftime("%H:%M:%S UTC")
         kpi = _get_latest_kpi(kpi_store)
         dates = demo_dates(7)
-        r = _seeded_random()      # stable per-minute seed
         results = []
 
         # ── 0-5: KPI values ──
@@ -233,11 +230,11 @@ def create_app(kpi_store: list = None):
         results.append(_fig_layout(fig, 480, margin=dict(t=60, b=40, l=30, r=30)))
 
         # ── 18: Breakdown stats ──
-        total_docs = s.total_docs or r.randint(1000, 3000)
+        total_docs = s.total_docs or random.randint(1000, 3000)
         stats = [html.Div([html.Span("Total Docs: ", className="text-muted"),
                            html.Span(f"{total_docs:,}", className="text-info fw-bold")], className="mb-2")]
         for label, pct in adv.items():
-            conf = round(r.uniform(0.72, 0.96), 2)
+            conf = round(random.uniform(0.72, 0.96), 2)
             stats.append(html.Div([
                 html.Div([html.Span(f"{ADV_EMOJIS[label]} "), html.Span(label, style={"color": ADV_COLORS[label]}, className="fw-bold"),
                           html.Span(f" — {pct}%", className="text-light", style={"fontSize": "0.85rem"})]),
@@ -247,15 +244,15 @@ def create_app(kpi_store: list = None):
         results.append(stats)
 
         # ── 19: Sentiment timeline (with emotion breakdown like reference) ──
-        pos_t = [round(r.uniform(35, 55), 1) for _ in range(7)]
-        neg_t = [round(r.uniform(18, 35), 1) for _ in range(7)]
+        pos_t = [round(random.uniform(35, 55), 1) for _ in range(7)]
+        neg_t = [round(random.uniform(18, 35), 1) for _ in range(7)]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=pos_t, name="Positive", mode="lines+markers",
                                  line=dict(color="#27AE60", width=3), fill="tozeroy", fillcolor="rgba(39,174,96,0.12)"))
         fig.add_trace(go.Scatter(x=dates, y=neg_t, name="Negative", mode="lines+markers",
                                  line=dict(color="#E74C3C", width=3), fill="tozeroy", fillcolor="rgba(231,76,60,0.12)"))
         for emo, color in [("Admiration", "#C8963E"), ("Neutral", "#8E8E8E"), ("Joy", "#D4D455"), ("Disgust", "#2A9D8F")]:
-            fig.add_trace(go.Scatter(x=dates, y=[round(r.uniform(2, 40), 1) for _ in range(7)],
+            fig.add_trace(go.Scatter(x=dates, y=[round(random.uniform(2, 40), 1) for _ in range(7)],
                                      name=emo, mode="lines", line=dict(color=color, width=2, dash="dot")))
         results.append(_fig_layout(fig, 300, margin=_MARGIN_MD, legend=dict(orientation="h", y=1.12),
                                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
@@ -271,12 +268,12 @@ def create_app(kpi_store: list = None):
                                               angularaxis=dict(color="white"))))
 
         # ── 21-44: Social Media Stats (12 cards × value + delta) ──
-        mv = kpi.mention_volume; reach = r.randint(300000, 800000)
-        interactions = kpi.engagement_volume or r.randint(50000, 200000)
-        likes = r.randint(40000, 80000); pos_c = int(mv * s.positive / 100)
-        neg_c = int(mv * s.negative / 100); ugc = r.randint(400, 700)
-        vids = r.randint(3, 12); ns_reach = r.randint(8000, 15000)
-        ns_mentions = r.randint(1, 5); viral = r.randint(8, 35)
+        mv = kpi.mention_volume; reach = random.randint(300000, 800000)
+        interactions = kpi.engagement_volume or random.randint(50000, 200000)
+        likes = random.randint(40000, 80000); pos_c = int(mv * s.positive / 100)
+        neg_c = int(mv * s.negative / 100); ugc = random.randint(400, 700)
+        vids = random.randint(3, 12); ns_reach = random.randint(8000, 15000)
+        ns_mentions = random.randint(1, 5); viral = random.randint(8, 35)
         avg_eng = round(interactions / max(mv, 1), 1)
 
         def _fk(v):
@@ -294,15 +291,15 @@ def create_app(kpi_store: list = None):
             results.append(val); results.append(delta)
 
         # ── 45: Mentions timeline ──
-        md = [r.randint(3, 20) for _ in range(3)] + [0] + [r.randint(80, 340) for _ in range(3)]
+        md = [random.randint(3, 20) for _ in range(3)] + [0] + [random.randint(80, 340) for _ in range(3)]
         fig = go.Figure(go.Scatter(x=dates, y=md, mode="lines+markers", line=dict(color="#3498DB", width=3),
                                    fill="tozeroy", fillcolor="rgba(52,152,219,0.12)"))
         results.append(_fig_layout(fig, 260, margin=_MARGIN_MD, showlegend=False,
                                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)"), yaxis=dict(gridcolor="rgba(255,255,255,0.08)")))
 
         # ── 46: Reach timeline ──
-        rd = [r.randint(500, 2000) for _ in range(3)] + [r.randint(500, 1500)] + \
-             [r.randint(150000, 2500000) for _ in range(2)] + [r.randint(40000, 70000)]
+        rd = [random.randint(500, 2000) for _ in range(3)] + [random.randint(500, 1500)] + \
+             [random.randint(150000, 2500000) for _ in range(2)] + [random.randint(40000, 70000)]
         fig = go.Figure(go.Scatter(x=dates, y=rd, mode="lines+markers", line=dict(color="#27AE60", width=3),
                                    fill="tozeroy", fillcolor="rgba(39,174,96,0.12)"))
         results.append(_fig_layout(fig, 260, margin=dict(t=20, b=40, l=60, r=20), showlegend=False,
@@ -316,9 +313,9 @@ def create_app(kpi_store: list = None):
 
         # ── 48: Engagement heatmap ──
         plist = list(plat.keys())
-        z = [[max(0, int(plat[p] * r.uniform(0.01, 0.15))) for _ in range(3)] +
-             [max(0, int(plat[p] * r.uniform(0, 0.05)))] +
-             [int(plat[p] * r.uniform(0.6, 1.2)) for _ in range(3)] for p in plist]
+        z = [[max(0, int(plat[p] * random.uniform(0.01, 0.15))) for _ in range(3)] +
+             [max(0, int(plat[p] * random.uniform(0, 0.05)))] +
+             [int(plat[p] * random.uniform(0.6, 1.2)) for _ in range(3)] for p in plist]
         fig = go.Figure(go.Heatmap(z=z, x=dates, y=[p.title() for p in plist],
                                    colorscale=[[0, "rgba(0,0,0,0.8)"], [0.25, "#1a3a4a"],
                                                [0.5, "#2980B9"], [0.75, "#F39C12"], [1, "#E74C3C"]],
@@ -430,9 +427,9 @@ def create_app(kpi_store: list = None):
 
         # ── 53-54: Political party pies ──
         for _ in range(2):
-            raw = {"BJP": r.uniform(32, 45), "TMC": r.uniform(22, 35),
-                   "LEFT": r.uniform(4, 10), "Congress": r.uniform(2, 7),
-                   "Neutral": r.uniform(10, 20), "Others": r.uniform(2, 6)}
+            raw = {"BJP": random.uniform(32, 45), "TMC": random.uniform(22, 35),
+                   "LEFT": random.uniform(4, 10), "Congress": random.uniform(2, 7),
+                   "Neutral": random.uniform(10, 20), "Others": random.uniform(2, 6)}
             total = sum(raw.values())
             raw = {k: round(v / total * 100, 1) for k, v in raw.items()}
             fig = go.Figure(go.Pie(labels=list(raw.keys()), values=list(raw.values()),
@@ -448,8 +445,8 @@ def create_app(kpi_store: list = None):
 
         # ── 57: Party sentiment bar ──
         parties = ["BJP", "TMC", "LEFT", "Congress", "Neutral"]
-        pp = [round(r.uniform(40, 70), 1) for _ in parties]
-        pn = [round(r.uniform(15, 45), 1) for _ in parties]
+        pp = [round(random.uniform(40, 70), 1) for _ in parties]
+        pn = [round(random.uniform(15, 45), 1) for _ in parties]
         pneu = [round(100 - a - b, 1) for a, b in zip(pp, pn)]
         fig = go.Figure()
         fig.add_trace(go.Bar(x=parties, y=pp, name="Positive", marker_color="#27AE60", text=[f"{v}%" for v in pp], textposition="inside"))
@@ -992,30 +989,28 @@ def _get_latest_kpi(store=None):
     if store and len(store) > 0:
         return store[-1]
     from engine.models import EmotionDistribution
-    r = _seeded_random()
-    now_ist = datetime.now(IST)
     return KPISnapshot(
         campaign_id="demo", phase=RallyPhase.PRE_24H,
-        window_start=now_ist, window_end=now_ist,
-        mention_volume=r.randint(1500, 5000), engagement_volume=r.randint(50000, 200000),
-        sentiment_share=SentimentShare(positive=round(r.uniform(35, 55), 1), negative=round(r.uniform(20, 35), 1),
-                                       neutral=round(r.uniform(15, 25), 1), mixed=round(r.uniform(5, 15), 1),
-                                       total_docs=r.randint(1000, 3000)),
-        rally_mood_score=round(r.uniform(45, 75), 1), leader_favourability_score=round(r.uniform(40, 70), 1),
-        share_of_voice=round(r.uniform(30, 60), 1), bot_suspicion_score=round(r.uniform(5, 25), 1),
-        polarization_index=round(r.uniform(20, 55), 1),
-        platform_breakdown={"twitter": r.randint(500, 2000), "facebook": r.randint(300, 1000),
-                            "instagram": r.randint(400, 1200), "youtube": r.randint(100, 500),
-                            "news": r.randint(50, 200), "reddit": r.randint(20, 100)},
-        emotion_distribution=EmotionDistribution(hope=round(r.uniform(10, 30), 1), anger=round(r.uniform(10, 25), 1),
-                                                  pride=round(r.uniform(5, 15), 1), excitement=round(r.uniform(10, 25), 1),
-                                                  trust=round(r.uniform(5, 20), 1), fear=round(r.uniform(3, 10), 1)),
-        top_hashtags=[{"hashtag": h, "count": r.randint(50, 800)} for h in
+        window_start=datetime.utcnow(), window_end=datetime.utcnow(),
+        mention_volume=random.randint(1500, 5000), engagement_volume=random.randint(50000, 200000),
+        sentiment_share=SentimentShare(positive=round(random.uniform(35, 55), 1), negative=round(random.uniform(20, 35), 1),
+                                       neutral=round(random.uniform(15, 25), 1), mixed=round(random.uniform(5, 15), 1),
+                                       total_docs=random.randint(1000, 3000)),
+        rally_mood_score=round(random.uniform(45, 75), 1), leader_favourability_score=round(random.uniform(40, 70), 1),
+        share_of_voice=round(random.uniform(30, 60), 1), bot_suspicion_score=round(random.uniform(5, 25), 1),
+        polarization_index=round(random.uniform(20, 55), 1),
+        platform_breakdown={"twitter": random.randint(500, 2000), "facebook": random.randint(300, 1000),
+                            "instagram": random.randint(400, 1200), "youtube": random.randint(100, 500),
+                            "news": random.randint(50, 200), "reddit": random.randint(20, 100)},
+        emotion_distribution=EmotionDistribution(hope=round(random.uniform(10, 30), 1), anger=round(random.uniform(10, 25), 1),
+                                                  pride=round(random.uniform(5, 15), 1), excitement=round(random.uniform(10, 25), 1),
+                                                  trust=round(random.uniform(5, 20), 1), fear=round(random.uniform(3, 10), 1)),
+        top_hashtags=[{"hashtag": h, "count": random.randint(50, 800)} for h in
                       ["ModiInKolkata", "KhelaHobe", "BJP4Bengal", "BengalElection2026", "ModiMegaRally"]],
-        top_influencers=[{"name": n, "engagement": r.randint(1000, 20000)} for n in
+        top_influencers=[{"name": n, "engagement": random.randint(1000, 20000)} for n in
                          ["@BJPBengal", "@AITCofficial", "@ndtv", "@ABPAnanda"]],
         top_influencers_positive=[
-            {"name": n, "platform": p, "followers": f, "engagement": r.randint(e[0], e[1]), "positive_pct": round(r.uniform(pp[0], pp[1]), 1)}
+            {"name": n, "platform": p, "followers": f, "engagement": random.randint(e[0], e[1]), "positive_pct": round(random.uniform(pp[0], pp[1]), 1)}
             for n, p, f, e, pp in [
                 ("@BJPBengal", "Twitter", 285000, (15000, 30000), (78, 95)), ("@NaMo_BJP", "Twitter", 520000, (12000, 28000), (75, 92)),
                 ("Suvendu Adhikari", "Facebook", 410000, (10000, 22000), (72, 90)), ("@BJP4India", "Twitter", 1850000, (9000, 20000), (70, 88)),
@@ -1029,7 +1024,7 @@ def _get_latest_kpi(store=None):
                 ("BJP Mahila WB", "Facebook", 52000, (2200, 6500), (49, 69)), ("@Dev_Adhikari_", "Twitter", 125000, (2000, 6000), (48, 68)),
             ]],
         top_influencers_negative=[
-            {"name": n, "platform": p, "followers": f, "engagement": r.randint(e[0], e[1]), "negative_pct": round(r.uniform(np[0], np[1]), 1)}
+            {"name": n, "platform": p, "followers": f, "engagement": random.randint(e[0], e[1]), "negative_pct": round(random.uniform(np[0], np[1]), 1)}
             for n, p, f, e, np in [
                 ("@AITCofficial", "Twitter", 560000, (15000, 30000), (75, 92)), ("@MamataOfficial", "Twitter", 890000, (12000, 28000), (72, 90)),
                 ("TMC Youth", "Facebook", 320000, (10000, 22000), (70, 88)), ("@AbhishekBan", "Twitter", 210000, (9000, 20000), (68, 86)),
@@ -1057,7 +1052,7 @@ def run_server(port=8050, debug=False):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8050)))
+    parser.add_argument("--port", type=int, default=8050)
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
     run_server(port=args.port, debug=args.debug)
