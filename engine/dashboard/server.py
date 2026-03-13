@@ -46,8 +46,12 @@ def create_app(kpi_store: list = None):
         return None
 
     app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE],
-                    title="JanPulse AI")
+                    title="JanPulse AI", suppress_callback_exceptions=True)
     app.layout = build_layout()
+
+    @app.server.route("/health")
+    def health():
+        return {"status": "ok", "version": "v3-fix-go-shadow"}
 
     # Build the full callback outputs list
     outputs = [
@@ -144,8 +148,26 @@ def create_app(kpi_store: list = None):
         Output("live-alerts-feed", "children"),           # 102
     ]
 
+    # Pre-build empty fallback for error handling (outside callback to avoid scope issues)
+    _empty_fig = go.Figure()
+    _empty_fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+    _fallback = tuple(
+        _empty_fig if o.component_property == "figure"
+        else {} if o.component_property == "style"
+        else "—"
+        for o in outputs
+    )
+
     @app.callback(outputs, [Input("refresh-interval", "n_intervals")])
     def update_dashboard(n):
+        try:
+            return _update_impl(kpi_store, outputs)
+        except Exception as exc:
+            logger.error(f"Dashboard callback failed: {exc}")
+            import traceback; traceback.print_exc()
+            return _fallback
+
+    def _update_impl(kpi_store, outputs):
         now_str = datetime.utcnow().strftime("%H:%M:%S UTC")
         kpi = _get_latest_kpi(kpi_store)
         dates = demo_dates(7)
@@ -912,14 +934,11 @@ def create_app(kpi_store: list = None):
         actual = len(results)
         if actual != expected:
             logger.error(f"Output mismatch: got {actual}, expected {expected}")
-            # Pad or trim to match
             if actual < expected:
-                empty_fig = __import__('plotly.graph_objects', fromlist=['graph_objects']).Figure()
-                empty_fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                 for i in range(actual, expected):
                     o = outputs[i]
                     if o.component_property == "figure":
-                        results.append(empty_fig)
+                        results.append(_empty_fig)
                     elif o.component_property == "style":
                         results.append({})
                     else:
