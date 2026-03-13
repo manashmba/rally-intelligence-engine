@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "sentiment": {
+    "labels": ["positive", "negative", "neutral", "mixed", "sarcastic_positive", "sarcastic_negative"],
+    "codes": {"positive": "POS", "negative": "NEG", "neutral": "NEU", "mixed": "MIX", "sarcastic_positive": "SAR_POS", "sarcastic_negative": "SAR_NEG"}
+  },
+  "emotions": {
+    "labels": ["hope", "anger", "pride", "fear", "trust", "excitement", "frustration", "disgust", "sarcasm", "joy", "sadness"],
+    "codes": {"hope": "EMO_HOPE", "anger": "EMO_ANGER", "pride": "EMO_PRIDE", "fear": "EMO_FEAR", "trust": "EMO_TRUST", "excitement": "EMO_EXCITE", "frustration": "EMO_FRUST", "disgust": "EMO_DISGUST", "sarcasm": "EMO_SARC", "joy": "EMO_JOY", "sadness": "EMO_SAD"}
+  },
+  "topics": {
+    "TOP_JOBS": {"label": "Employment and Jobs", "subtopics": ["unemployment", "rozgar", "job creation", "skill development", "MSME"]},
+    "TOP_DEV": {"label": "Development and Infrastructure", "subtopics": ["vikas", "roads", "metro", "smart city", "housing"]},
+    "TOP_IDENT": {"label": "Identity and Cultural Politics", "subtopics": ["Hindu identity", "Bengali pride", "sonar bangla", "language rights"]},
+    "TOP_CORR": {"label": "Corruption and Governance", "subtopics": ["cut money", "tolabaj", "scam", "syndicate raj"]},
+    "TOP_WOMEN": {"label": "Women and Social Welfare", "subtopics": ["Lakshmir Bhandar", "women safety", "Ujjwala"]},
+    "TOP_LAW": {"label": "Law and Order", "subtopics": ["political violence", "sandeshkhali", "safety"]},
+    "TOP_EDU": {"label": "Education", "subtopics": ["school quality", "teacher recruitment", "NEP"]},
+    "TOP_AGRI": {"label": "Agriculture", "subtopics": ["farmer welfare", "MSP", "crop insurance"]},
+    "TOP_HEALTH": {"label": "Health", "subtopics": ["hospital", "Ayushman Bharat", "health infrastructure"]},
+    "TOP_SEC": {"label": "National Security", "subtopics": ["border", "defence", "terrorism"]},
+    "TOP_RALLY": {"label": "Rally and Event Meta", "subtopics": ["crowd size", "speech quality", "media coverage"]},
+    "TOP_OPP": {"label": "Opposition Critique", "subtopics": ["anti-TMC", "anti-BJP", "whataboutism"]},
+    "TOP_LEADER": {"label": "Leader Personality", "subtopics": ["charisma", "oratory", "trustworthiness"]}
+  },
+  "stance": {
+    "labels": ["support", "oppose", "neutral", "undetermined"],
+    "targets": ["leader", "party", "rally"]
+  },
+  "platforms": {
+    "PLT_TW": "twitter", "PLT_FB": "facebook", "PLT_IG": "instagram",
+    "PLT_YT": "youtube", "PLT_RD": "reddit", "PLT_TG": "telegram",
+    "PLT_SC": "sharechat", "PLT_MJ": "moj_josh", "PLT_NW": "news",
+    "PLT_GT": "google_trends", "PLT_LS": "livestream_chat",
+    "PLT_SP": "speech_transcript", "PLT_BF": "blog_forum"
+  },
+  "phases": {
+    "T_PRE_7D": {"label": "Pre-Rally 7 Days", "window": "Day -7 to Day -4"},
+    "T_PRE_3D": {"label": "Pre-Rally 3 Days", "window": "Day -3 to Day -2"},
+    "T_PRE_24H": {"label": "Pre-Rally 24 Hours", "window": "Day -1"},
+    "T_PRE_6H": {"label": "Pre-Rally 6 Hours", "window": "Rally day, 6h before"},
+    "T_LIVE": {"label": "Live Rally", "window": "Rally start to end"},
+    "T_POST_2H": {"label": "Post-Rally 2 Hours", "window": "Rally end to +2h"},
+    "T_POST_6H": {"label": "Post-Rally 6 Hours", "window": "+2h to +6h"},
+    "T_POST_24H": {"label": "Post-Rally 24 Hours", "window": "+6h to +24h"},
+    "T_POST_48H": {"label": "Post-Rally 48 Hours", "window": "+24h to +48h"},
+    "T_POST_72H": {"label": "Post-Rally 72 Hours", "window": "+48h to +72h"}
+  }
+}

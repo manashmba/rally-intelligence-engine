@@ -1,0 +1,60 @@
+{
+  "alert_rules": [
+    {
+      "name": "mood_drop_alert",
+      "metric": "rally_mood_score",
+      "condition": "delta_10min < -15",
+      "severity": "critical",
+      "channels": ["slack", "sms", "email"],
+      "cooldown_minutes": 15
+    },
+    {
+      "name": "viral_moment_alert",
+      "metric": "clip_share_rate_per_minute",
+      "condition": "value > 3x rolling_avg_30min",
+      "severity": "info",
+      "channels": ["slack"],
+      "cooldown_minutes": 5
+    },
+    {
+      "name": "troll_attack_alert",
+      "metric": "bot_suspicion_aggregate_5min",
+      "condition": "value > 40",
+      "severity": "high",
+      "channels": ["slack", "email"],
+      "cooldown_minutes": 20
+    },
+    {
+      "name": "misinformation_burst_alert",
+      "metric": "misinfo_flag_count_10min",
+      "condition": "value > 50",
+      "severity": "critical",
+      "channels": ["slack", "sms", "email"],
+      "cooldown_minutes": 30
+    },
+    {
+      "name": "negative_sentiment_surge",
+      "metric": "negative_sentiment_share_5min",
+      "condition": "value > 60 AND delta_15min > 20",
+      "severity": "high",
+      "channels": ["slack", "email"],
+      "cooldown_minutes": 15
+    },
+    {
+      "name": "volume_spike_alert",
+      "metric": "mention_volume_5min",
+      "condition": "value > 5x rolling_avg_1h",
+      "severity": "medium",
+      "channels": ["slack"],
+      "cooldown_minutes": 10
+    },
+    {
+      "name": "high_polarization_alert",
+      "metric": "polarization_index",
+      "condition": "value > 70",
+      "severity": "high",
+      "channels": ["slack", "email"],
+      "cooldown_minutes": 30
+    }
+  ]
+}

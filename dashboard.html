@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JanPulse AI — Executive Command Centre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #060B14;
+  --surface:   #0B1222;
+  --card:      #111D33;
+  --card2:     #0E1829;
+  --border:    rgba(255,255,255,0.09);
+  --cyan:      #4CC9F0;
+  --purple:    #B794F6;
+  --green:     #3EE8B5;
+  --amber:     #FCC737;
+  --red:       #FB8585;
+  --pink:      #F06BAD;
+  --text:      #E8EDF5;
+  --text-secondary: #A0AECA;
+  --muted:     #6B7FA3;
+  --bjp:       #FF7B1A;
+  --tmc:       #00D4F0;
+  --left:      #EF4444;
+  --congress:  #3B9FFF;
+  --neutral:   #8BA1B5;
+  --others:    #B44ECF;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(76,201,240,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(183,148,246,0.05) 0%, transparent 60%);
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: #1E3A5F; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2A5080; }
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
+.page { max-width: 1600px; margin: 0 auto; padding: 0 28px 56px; }
+
+/* ── HEADER ───────────────────────────────────────────────── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 0 20px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(6,11,20,0.94);
+  backdrop-filter: blur(16px);
+}
+.header-brand { display: flex; align-items: center; gap: 16px; }
+.header-logo {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: linear-gradient(135deg,#1E40AF,#0EA5E9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; box-shadow: 0 0 28px rgba(76,201,240,0.35);
+}
+.header-title {
+  font-size: 1.75rem; font-weight: 900; letter-spacing: -0.5px; color: #fff;
+  background: linear-gradient(135deg, #fff 60%, var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-sub { font-size: 0.82rem; color: var(--text-secondary); letter-spacing: 0.3px; margin-top: 3px; font-weight: 500; }
+.header-right { display: flex; align-items: center; gap: 20px; }
+.header-clock { font-size: 1.4rem; font-weight: 700; color: var(--cyan); font-variant-numeric: tabular-nums; }
+.phase-badge {
+  background: linear-gradient(135deg,#1E3A5F,#164E63);
+  border: 1px solid rgba(76,201,240,0.35);
+  border-radius: 24px; padding: 7px 18px;
+  font-size: 0.76rem; font-weight: 700; color: var(--cyan);
+  letter-spacing: 0.6px; text-transform: uppercase;
+  box-shadow: 0 0 16px rgba(76,201,240,0.18);
+  display: flex; align-items: center; gap: 7px;
+}
+.phase-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+
+/* ── EXECUTIVE SUMMARY ────────────────────────────────────── */
+.exec-summary {
+  background: linear-gradient(135deg, rgba(76,201,240,0.06), rgba(183,148,246,0.04));
+  border: 1px solid rgba(76,201,240,0.18);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin: 24px 0 28px;
+}
+.exec-title {
+  font-size: 1.12rem; font-weight: 700; color: var(--cyan);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.exec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.exec-insight {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 18px;
+  background: rgba(0,0,0,0.22);
+  border-radius: 12px;
+  border-left: 3px solid;
+}
+.exec-insight.good { border-color: var(--green); }
+.exec-insight.caution { border-color: var(--amber); }
+.exec-insight.alert { border-color: var(--red); }
+.exec-signal {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.exec-signal.good { background: rgba(62,232,181,0.15); }
+.exec-signal.caution { background: rgba(252,199,55,0.15); }
+.exec-signal.alert { background: rgba(251,133,133,0.15); }
+.exec-label { font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; font-weight: 600; }
+.exec-value { font-size: 1.08rem; font-weight: 700; color: #fff; line-height: 1.35; }
+.exec-explain { font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+/* ── SECTION HEADERS ──────────────────────────────────────── */
+.section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0 28px; }
+.section-header { margin-bottom: 22px; }
+.section-title { font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; letter-spacing: -0.2px; }
+.section-sub { font-size: 0.82rem; color: var(--text-secondary); margin-top: 5px; line-height: 1.55; }
+.section-what-it-means {
+  font-size: 0.8rem; color: var(--cyan); margin-top: 8px;
+  padding: 8px 14px; background: rgba(76,201,240,0.06);
+  border-radius: var(--radius-sm); border-left: 3px solid var(--cyan);
+  line-height: 1.5;
+}
+
+/* ── GRID ─────────────────────────────────────────────────── */
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(2,1fr); }
+.g3 { grid-template-columns: repeat(3,1fr); }
+.g4 { grid-template-columns: repeat(4,1fr); }
+.g6 { grid-template-columns: repeat(6,1fr); }
+.g-4-2 { grid-template-columns: 4fr 2fr; }
+.g-7-5 { grid-template-columns: 7fr 5fr; }
+.g-6-3-3 { grid-template-columns: 6fr 3fr 3fr; }
+.mb { margin-bottom: 16px; }
+.mb2 { margin-bottom: 32px; }
+
+/* ── CARDS ────────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.card:hover { border-color: rgba(255,255,255,0.14); box-shadow: 0 6px 32px rgba(0,0,0,0.45); transform: translateY(-1px); }
+.card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.025);
+}
+.card-body { padding: 16px 18px; }
+.card-body-flush { padding: 0; }
+
+/* ── KPI CARDS ────────────────────────────────────────────── */
+.kpi-card {
+  border-radius: var(--radius-md); padding: 22px;
+  position: relative; overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.kpi-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+}
+.kpi-card.c-cyan { background: linear-gradient(135deg,#0C1E3A,#0A2040); border: 1px solid rgba(56,189,248,0.2); box-shadow: 0 0 20px rgba(56,189,248,0.07); }
+.kpi-card.c-cyan::before { background: linear-gradient(90deg,var(--cyan),#0EA5E9); }
+.kpi-card.c-green { background: linear-gradient(135deg,#0A2E20,#092B1D); border: 1px solid rgba(52,211,153,0.2); box-shadow: 0 0 20px rgba(52,211,153,0.07); }
+.kpi-card.c-green::before { background: linear-gradient(90deg,var(--green),#10B981); }
+.kpi-card.c-red { background: linear-gradient(135deg,#2A1012,#241010); border: 1px solid rgba(248,113,113,0.2); box-shadow: 0 0 20px rgba(248,113,113,0.07); }
+.kpi-card.c-red::before { background: linear-gradient(90deg,var(--red),#EF4444); }
+.kpi-card.c-amber { background: linear-gradient(135deg,#2A1E08,#261C07); border: 1px solid rgba(251,191,36,0.2); box-shadow: 0 0 20px rgba(251,191,36,0.07); }
+.kpi-card.c-amber::before { background: linear-gradient(90deg,var(--amber),#F59E0B); }
+.kpi-card.c-purple { background: linear-gradient(135deg,#1C1035,#170D2E); border: 1px solid rgba(167,139,250,0.2); box-shadow: 0 0 20px rgba(167,139,250,0.07); }
+.kpi-card.c-purple::before { background: linear-gradient(90deg,var(--purple),#8B5CF6); }
+.kpi-card.c-pink { background: linear-gradient(135deg,#2A0D1C,#240A17); border: 1px solid rgba(236,72,153,0.2); box-shadow: 0 0 20px rgba(236,72,153,0.07); }
+.kpi-card.c-pink::before { background: linear-gradient(90deg,var(--pink),#DB2777); }
+
+.kpi-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.3px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+.kpi-value { font-size: 2.5rem; font-weight: 900; line-height: 1; letter-spacing: -1.5px; color: #fff; transition: transform .3s ease; }
+.kpi-value.pulse { animation: kpiPulse .5s ease; }
+@keyframes kpiPulse { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
+.live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#34D399; margin-right:6px; animation:liveBlink 1.5s infinite; }
+@keyframes liveBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.mention-card, .alert-item { transition: opacity .4s ease, transform .4s ease; }
+.mention-card.fade-in, .alert-item.fade-in { animation: fadeSlideIn .5s ease; }
+@keyframes fadeSlideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+.kpi-sub { font-size: 0.78rem; color: var(--text-secondary); margin-top: 8px; display: flex; align-items: center; gap: 5px; font-weight: 500; }
+.kpi-icon { font-size: 2rem; position: absolute; right: 16px; top: 16px; opacity: 0.12; }
+.kpi-meaning {
+  font-size: 0.72rem; color: var(--cyan); margin-top: 10px;
+  padding: 6px 10px; background: rgba(76,201,240,0.07);
+  border-radius: 6px; line-height: 1.4;
+}
+.delta-up { color: var(--green); font-weight: 700; } .delta-dn { color: var(--red); font-weight: 700; }
+
+/* ── SM STAT CARDS ────────────────────────────────────────── */
+.sm-card {
+  background: var(--card2); border-radius: 12px; padding: 16px;
+  border: 1px solid var(--border);
+  border-top: 3px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.sm-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.sm-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.1px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+.sm-value { font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1; }
+.sm-delta { font-size: 0.74rem; margin-top: 6px; font-weight: 600; }
+
+/* ── CHART CARDS ──────────────────────────────────────────── */
+.chart-wrap { position: relative; }
+.chart-wrap canvas { max-height: 280px; }
+
+/* ── MENTION CARDS ────────────────────────────────────────── */
+.mention-card {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.mention-card:hover { border-color: rgba(76,201,240,0.3); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.mention-source { font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-weight: 500; }
+.mention-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; margin-bottom: 12px; }
+.mention-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.mention-tag { font-size: 0.68rem; background: rgba(76,201,240,0.12); color: var(--cyan); border-radius: 5px; padding: 3px 8px; font-weight: 500; }
+.mention-eng { font-size: 0.76rem; color: var(--amber); font-weight: 700; display: flex; align-items: center; gap: 5px; }
+
+/* ── TABLES ───────────────────────────────────────────────── */
+.rie-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.rie-table th {
+  padding: 11px 14px; text-align: left;
+  background: rgba(255,255,255,0.04);
+  color: var(--muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.9px;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.rie-table td {
+  padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--text); vertical-align: middle;
+}
+.rie-table tr:last-child td { border-bottom: none; }
+.rie-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+.rie-table tr:hover td { background: rgba(76,201,240,0.04); }
+.rie-table .rank { color: var(--muted); font-size: 0.72rem; font-weight: 600; }
+.rie-table .handle { color: var(--cyan); font-weight: 600; }
+
+/* ── PARTY BADGES ─────────────────────────────────────────── */
+.party-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.pb-bjp  { background: rgba(255,107,0,.15); color: var(--bjp);      border: 1px solid rgba(255,107,0,.3); }
+.pb-tmc  { background: rgba(0,188,212,.15); color: var(--tmc);      border: 1px solid rgba(0,188,212,.3); }
+.pb-left { background: rgba(229,57,53,.15); color: var(--left);     border: 1px solid rgba(229,57,53,.3); }
+.pb-inc  { background: rgba(30,136,229,.15); color: var(--congress); border: 1px solid rgba(30,136,229,.3); }
+.pb-neu  { background: rgba(120,144,156,.15);color: var(--neutral);  border: 1px solid rgba(120,144,156,.3); }
+.pb-oth  { background: rgba(156,39,176,.15); color: var(--others);   border: 1px solid rgba(156,39,176,.3); }
+
+/* ── CONFIDENCE BAR ───────────────────────────────────────── */
+.conf-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); overflow: hidden; margin-top: 4px; }
+.conf-fill { height: 100%; border-radius: 2px; }
+
+/* ── ALERT FEED ───────────────────────────────────────────── */
+.alert-item {
+  border-left: 3px solid;
+  padding: 10px 14px; margin-bottom: 8px;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.82rem;
+}
+.alert-critical { border-color: var(--red); background: rgba(251,133,133,0.07); }
+.alert-warning { border-color: var(--amber); background: rgba(252,199,55,0.07); }
+.alert-info { border-color: var(--cyan); background: rgba(76,201,240,0.07); }
+.alert-title { font-weight: 700; color: #fff; margin-bottom: 3px; }
+.alert-meta { font-size: 0.72rem; color: var(--text-secondary); }
+
+/* ── HASHTAG PILLS ────────────────────────────────────────── */
+.ht-list { display: flex; flex-direction: column; gap: 10px; }
+.ht-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ht-name { font-size: 0.84rem; color: var(--cyan); font-weight: 600; }
+.ht-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.ht-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,var(--cyan),var(--purple)); }
+.ht-count { font-size: 0.74rem; color: var(--text-secondary); min-width: 40px; text-align: right; font-weight: 600; }
+
+/* ── INFLUENCER CARDS ─────────────────────────────────────── */
+.inf-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.15s;
+}
+.inf-item:hover { background: rgba(255,255,255,0.02); }
+.inf-item:last-child { border-bottom: none; }
+.inf-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
+}
+.inf-name { font-size: 0.84rem; color: var(--text); font-weight: 600; }
+.inf-meta { font-size: 0.72rem; color: var(--text-secondary); }
+.inf-score { margin-left: auto; font-size: 0.9rem; font-weight: 800; }
+
+/* ── SENTIMENT BREAKDOWN ──────────────────────────────────── */
+.sent-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.82rem;
+}
+.sent-row:last-child { border-bottom: none; }
+.sent-emoji { font-size: 1.1rem; width: 24px; text-align: center; }
+.sent-label { width: 92px; color: var(--text); font-weight: 500; }
+.sent-pct { width: 48px; text-align: right; font-weight: 700; color: #fff; }
+.sent-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.sent-bar { height: 100%; border-radius: 3px; }
+
+/* ── POLARITY GAUGE ───────────────────────────────────────── */
+.gauge-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 16px; }
+.gauge-arc { position: relative; width: 170px; height: 90px; overflow: hidden; }
+.gauge-arc::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 170px; border-radius: 50%;
+  background: conic-gradient(from 180deg, #F87171 0deg, #FBBF24 45deg, #34D399 90deg);
+  clip-path: polygon(0 100%,100% 100%,100% 50%,50% 50%,0 50%);
+}
+.gauge-needle {
+  position: absolute; bottom: 0; left: 50%;
+  transform-origin: bottom center;
+  width: 3px; height: 80px;
+  background: linear-gradient(to top, var(--cyan), transparent);
+  border-radius: 2px;
+  margin-left: -1.5px;
+}
+.gauge-label { font-size: 2.2rem; font-weight: 900; color: #fff; margin-top: 12px; }
+.gauge-sub { font-size: 0.8rem; color: var(--green); font-weight: 700; }
+
+/* ── BOT ACTIVITY SECTION ─────────────────────────────────── */
+.bot-section {
+  border: 2px solid rgba(252,199,55,0.22);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  background: linear-gradient(135deg, rgba(252,199,55,0.04), rgba(251,133,133,0.03));
+  margin-bottom: 32px;
+}
+.bot-section-title {
+  font-size: 1.35rem; font-weight: 800; color: #fff;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px; letter-spacing: -0.2px;
+}
+.bot-section-sub {
+  font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.55;
+}
+.bot-explain {
+  font-size: 0.84rem; color: var(--amber);
+  padding: 12px 16px; background: rgba(252,199,55,0.07);
+  border-radius: var(--radius-sm); border-left: 3px solid var(--amber);
+  margin-bottom: 22px; line-height: 1.55;
+}
+.bot-kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 20px; }
+.bot-kpi {
+  background: rgba(0,0,0,0.25); border-radius: 12px; padding: 16px;
+  border: 1px solid var(--border); text-align: center;
+}
+.bot-kpi-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1.1px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+.bot-kpi-value { font-size: 1.85rem; font-weight: 800; color: #fff; line-height: 1; }
+.bot-kpi-sub { font-size: 0.74rem; margin-top: 6px; font-weight: 500; }
+.bot-finding {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 12px 16px; margin-bottom: 10px;
+  background: rgba(0,0,0,0.18); border-radius: 10px;
+  border-left: 3px solid var(--amber);
+}
+.bot-finding-icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 2px; }
+.bot-finding-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+.bot-finding-text strong { color: #fff; }
+.bot-ht-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.bot-ht-item:last-child { border-bottom: none; }
+.bot-ht-name { font-size: 0.86rem; color: var(--cyan); font-weight: 600; flex: 1; }
+.bot-ht-badge {
+  font-size: 0.62rem; font-weight: 700; padding: 3px 10px; border-radius: 12px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.bot-ht-pct { font-size: 0.9rem; font-weight: 800; min-width: 54px; text-align: right; }
+.bot-bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; width: 90px; }
+.bot-bar-fill { height: 100%; border-radius: 3px; }
+
+/* ── TRAFFIC LIGHT ────────────────────────────────────────── */
+.traffic-light {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.68rem; font-weight: 700; padding: 3px 10px;
+  border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.tl-green { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+.tl-amber { background: rgba(251,191,36,0.15); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+.tl-red { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+
+/* ── UTILITY ──────────────────────────────────────────────── */
+.text-cyan { color: var(--cyan); }
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+.text-amber { color: var(--amber); }
+.text-purple { color: var(--purple); }
+.text-muted { color: var(--muted); }
+.fw-700 { font-weight: 700; }
+.fw-800 { font-weight: 800; }
+.full { grid-column: 1 / -1; }
+.flex-row { display: flex; align-items: center; gap: 8px; }
+.spacer { flex: 1; }
+
+/* ── NAV TABS ─────────────────────────────────────────────── */
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.tab {
+  padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); color: var(--muted);
+  background: transparent; transition: all 0.18s;
+}
+.tab.active { background: rgba(56,189,248,0.12); color: var(--cyan); border-color: rgba(56,189,248,0.3); }
+.tab:hover:not(.active) { border-color: rgba(255,255,255,0.15); color: var(--text); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">🧠</div>
+    <div>
+      <div class="header-title">JanPulse AI</div>
+      <div class="header-sub">India's Public Mood Analysis Engine — AI-Powered Sentiment Intelligence</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div>
+      <div class="header-clock" id="live-clock">--:--:--</div>
+      <div style="font-size:.7rem;color:var(--muted);text-align:right" id="live-date">IST</div>
+      <div style="font-size:.65rem;color:var(--green);text-align:right;margin-top:2px"><span class="live-dot"></span>LIVE FEED</div>
+    </div>
+    <div class="phase-badge">
+      <div class="phase-dot"></div>
+      LIVE MONITORING — RALLY DAY
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ EXECUTIVE SUMMARY ═══════════════════════════════ -->
+<div class="exec-summary">
+  <div class="exec-title">📋 Executive Summary — At a Glance</div>
+  <div class="exec-grid">
+    <div class="exec-insight good">
+      <div class="exec-signal good">✅</div>
+      <div>
+        <div class="exec-label">Overall Mood</div>
+        <div class="exec-value">Strongly Positive (74/100)</div>
+        <div class="exec-explain">Public sentiment is overwhelmingly in favour. This is 6.8 points higher than yesterday, indicating strong rally momentum.</div>
+      </div>
+    </div>
+    <div class="exec-insight good">
+      <div class="exec-signal good">📈</div>
+      <div>
+        <div class="exec-label">Reach &amp; Engagement</div>
+        <div class="exec-value">2.41M mentions, 38.2M reach</div>
+        <div class="exec-explain">Rally conversation is dominating social media. Engagement is up +31.7% in 24hrs — well above benchmark.</div>
+      </div>
+    </div>
+    <div class="exec-insight caution">
+      <div class="exec-signal caution">⚠️</div>
+      <div>
+        <div class="exec-label">Bot Activity Alert</div>
+        <div class="exec-value">8.3% bot suspicion detected</div>
+        <div class="exec-explain">Both sides are deploying bots. Opposition bots are running negative campaigns against BJP/Modi. Details in Bot Intelligence section below.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ KPI STRIP ═══════════════════════════════ -->
+<div style="margin-top:4px" class="mb">
+  <div class="grid g6">
+    <div class="kpi-card c-cyan">
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-label">Rally Mood Score</div>
+      <div class="kpi-value" id="kpi-mood">74.2</div>
+      <div class="kpi-sub"><span class="delta-up">▲ +6.8</span> vs. yesterday &nbsp;/ 100</div>
+      <div class="kpi-meaning">How positive is the overall conversation? Higher = better for BJP</div>
+    </div>
+
+    <div class="kpi-card c-purple">
+      <div class="kpi-icon">💬</div>
+      <div class="kpi-label">Total Mentions</div>
+      <div class="kpi-value" id="kpi-mentions">2.41M</div>
+      <div class="kpi-sub"><span class="delta-up">▲ +18%</span> last 24h</div>
+      <div class="kpi-meaning">Total times the rally was discussed across all platforms</div>
+    </div>
+
+    <div class="kpi-card c-green">
+      <div class="kpi-icon">😊</div>
+      <div class="kpi-label">Positive Sentiment</div>
+      <div class="kpi-value" id="kpi-positive">62.4%</div>
+      <div class="kpi-sub"><span class="delta-up">▲ +4.1pp</span> vs. pre-rally</div>
+      <div class="kpi-meaning">% of conversations that are supportive or favourable</div>
+    </div>
+
+    <div class="kpi-card c-red">
+      <div class="kpi-icon">😠</div>
+      <div class="kpi-label">Negative Sentiment</div>
+      <div class="kpi-value" id="kpi-negative">21.8%</div>
+      <div class="kpi-sub"><span class="delta-dn">▼ -2.3pp</span> vs. pre-rally</div>
+      <div class="kpi-meaning">% of conversations that are critical or hostile</div>
+    </div>
+
+    <div class="kpi-card c-amber">
+      <div class="kpi-icon">🤖</div>
+      <div class="kpi-label">Bot Suspicion</div>
+      <div class="kpi-value" id="kpi-bots">8.3%</div>
+      <div class="kpi-sub"><span class="delta-dn">▼ -1.1pp</span> good signal</div>
+      <div class="kpi-meaning">% of accounts that appear to be automated/fake</div>
+    </div>
+
+    <div class="kpi-card c-pink">
+      <div class="kpi-icon">🌟</div>
+      <div class="kpi-label">Leader Favourability</div>
+      <div class="kpi-value" id="kpi-favour">71.6%</div>
+      <div class="kpi-sub"><span class="delta-up">▲ +9.2pp</span> since launch</div>
+      <div class="kpi-meaning">How favourably PM Modi is perceived in rally conversation</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MAIN CHART ROW ═══════════════════════════════ -->
+<div class="grid g3 mb">
+  <div class="card">
+    <div class="card-header">🥧 Sentiment Distribution <span class="traffic-light tl-green" style="margin-left:auto">Healthy</span></div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="sentimentPie"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">🎭 Emotion Profile</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="emotionBar"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">📡 Platform Activity</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="platformBar"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ADVANCED SENTIMENT ═══════════════════════════════ -->
+<hr class="section-divider" />
+<div class="section-header">
+  <div class="section-title">📊 Advanced Sentiment Analysis</div>
+  <div class="section-sub">Granular emotion breakdown with confidence scores and polarity mapping</div>
+  <div class="section-what-it-means">💡 <strong>What this means:</strong> We analyse not just positive/negative, but the specific emotions people express — admiration, joy, anger, fear, etc. This helps you understand <em>why</em> people feel the way they do.</div>
+</div>
+
+<div class="grid mb" style="grid-template-columns:5fr 3fr 4fr">
+  <div class="card">
+    <div class="card-header">Multi-Class Sentiment Classification</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="advSentimentPie"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">Polarity Gauge</div>
+    <div class="card-body" style="display:flex;align-items:center;justify-content:center;height:240px">
+      <div class="gauge-wrap">
+        <div class="gauge-arc">
+          <div class="gauge-needle" id="gauge-needle" style="transform:rotate(32deg)"></div>
+        </div>
+        <div class="gauge-label">+62</div>
+        <div class="gauge-sub">Net Positive</div>
+        <div style="margin-top:12px;font-size:.72rem;color:var(--muted);text-align:center">
+          Polarity: <span class="text-green fw-700">Strongly Positive</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">Detailed Breakdown</div>
+    <div class="card-body" id="sentiment-breakdown"></div>
+  </div>
+</div>
+
+<div class="grid g-7-5 mb2">
+  <div class="card">
+    <div class="card-header">📈 Sentiment Trend — 7-Day Window</div>
+    <div class="card-body"><div class="chart-wrap" style="height:220px"><canvas id="sentTimeline"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">🕸️ Emotion Radar — Multi-Dimensional</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="emotionRadar"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- ═══════════ BOT ACTIVITY INTELLIGENCE — NEW SECTION ════════════════════ -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<hr class="section-divider" />
+<div class="bot-section">
+  <div class="bot-section-title">🤖 Bot Activity Intelligence</div>
+  <div class="bot-section-sub">Automated account detection with political inclination analysis — Understanding who is deploying bots and their agenda</div>
+  <div class="bot-explain">
+    <strong>For Decision Makers:</strong> "Bots" are automated fake accounts that artificially amplify messages on social media. Below, we break down whether these bots are working <strong style="color:var(--bjp)">FOR BJP/PM Modi</strong> (amplifying positive narratives) or <strong style="color:var(--tmc)">FOR the Opposition</strong> (spreading negative narratives against BJP). This helps you understand how much of the online conversation is genuine vs. manufactured.
+  </div>
+
+  <!-- Bot KPI Cards -->
+  <div class="bot-kpi-grid">
+    <div class="bot-kpi">
+      <div class="bot-kpi-label">Accounts Analyzed</div>
+      <div class="bot-kpi-value" id="bot-total">21,847</div>
+      <div class="bot-kpi-sub text-muted">Total unique accounts</div>
+    </div>
+    <div class="bot-kpi" style="border-color:rgba(248,113,113,0.3)">
+      <div class="bot-kpi-label">Bots Detected</div>
+      <div class="bot-kpi-value text-red" id="bot-detected">1,812</div>
+      <div class="bot-kpi-sub text-red">8.3% of all accounts</div>
+    </div>
+    <div class="bot-kpi">
+      <div class="bot-kpi-label">Human Accounts</div>
+      <div class="bot-kpi-value text-green">20,035</div>
+      <div class="bot-kpi-sub text-green">91.7% genuine</div>
+    </div>
+    <div class="bot-kpi" style="border-color:rgba(255,107,0,0.3)">
+      <div class="bot-kpi-label">Pro-BJP/Modi Bots</div>
+      <div class="bot-kpi-value" style="color:var(--bjp)" id="bot-pro-bjp">42.3%</div>
+      <div class="bot-kpi-sub" style="color:var(--bjp)">of all bots</div>
+    </div>
+    <div class="bot-kpi" style="border-color:rgba(0,188,212,0.3)">
+      <div class="bot-kpi-label">Anti-BJP (Opposition)</div>
+      <div class="bot-kpi-value" style="color:var(--tmc)" id="bot-anti-bjp">38.1%</div>
+      <div class="bot-kpi-sub" style="color:var(--tmc)">of all bots</div>
+    </div>
+    <div class="bot-kpi">
+      <div class="bot-kpi-label">Neutral / Spam</div>
+      <div class="bot-kpi-value text-muted" id="bot-neutral-pct">19.6%</div>
+      <div class="bot-kpi-sub text-muted">of all bots</div>
+    </div>
+  </div>
+
+  <!-- Bot Charts Row -->
+  <div class="grid g3 mb">
+    <div class="card">
+      <div class="card-header" style="color:var(--amber)">🎯 Bot Political Inclination <span style="font-size:.68rem;color:var(--muted);margin-left:8px">Who are bots supporting?</span></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="botInclinationPie"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="color:var(--red)">💬 Bot Sentiment Breakdown <span style="font-size:.68rem;color:var(--muted);margin-left:8px">What are bots saying?</span></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="botSentimentPie"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="color:var(--cyan)">📱 Bot Platform Distribution <span style="font-size:.68rem;color:var(--muted);margin-left:8px">Where are bots active?</span></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="botPlatformBar"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- Bot Timeline + Hashtag Analysis -->
+  <div class="grid g-7-5 mb">
+    <div class="card">
+      <div class="card-header">📈 Bot Activity Over Time — 7 Day Trend</div>
+      <div class="card-body"><div class="chart-wrap" style="height:220px"><canvas id="botTimeline"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="color:var(--amber)">🔍 Bot-Infiltrated Hashtags <span style="font-size:.68rem;color:var(--muted);margin-left:6px">bot penetration %</span></div>
+      <div class="card-body" id="bot-hashtag-list" style="max-height:260px;overflow:auto"></div>
+    </div>
+  </div>
+
+  <!-- Key Findings for Decision Makers -->
+  <div class="card" style="border-color:rgba(251,191,36,0.3);border-width:2px">
+    <div class="card-header" style="background:rgba(251,191,36,0.06);color:var(--amber);font-size:0.9rem">
+      📌 Key Findings for Decision Makers — Bot Activity Summary
+    </div>
+    <div class="card-body" id="bot-findings"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SOCIAL MEDIA SUMMARY ═══════════════════════════════ -->
+<hr class="section-divider" />
+<div class="section-header">
+  <div class="section-title">📱 Social Media Summary</div>
+  <div class="section-sub">Cross-platform monitoring overview with reach, mentions, and engagement trends</div>
+  <div class="section-what-it-means">💡 <strong>What this means:</strong> These numbers show how widely the rally is being discussed online. "Reach" = how many people saw the content. "Engagement" = how many interacted (liked, shared, commented).</div>
+</div>
+
+<div class="grid g6 mb" id="sm-grid-1">
+  <div class="sm-card" style="border-top-color:var(--cyan)">
+    <div class="sm-label">Mentions</div>
+    <div class="sm-value">2.41M</div>
+    <div class="sm-delta text-green">▲ +18.4% (24h)</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--green)">
+    <div class="sm-label">SM Reach</div>
+    <div class="sm-value">38.2M</div>
+    <div class="sm-delta text-green">▲ +22.1% (24h)</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--amber)">
+    <div class="sm-label">Interactions</div>
+    <div class="sm-value">9.74M</div>
+    <div class="sm-delta text-green">▲ +31.7% (24h)</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--purple)">
+    <div class="sm-label">SM Likes</div>
+    <div class="sm-value">6.18M</div>
+    <div class="sm-delta text-green">▲ +28.5% (24h)</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--green)">
+    <div class="sm-label">Positive</div>
+    <div class="sm-value">62.4%</div>
+    <div class="sm-delta text-green">▲ +4.1pp</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--red)">
+    <div class="sm-label">Negative</div>
+    <div class="sm-value">21.8%</div>
+    <div class="sm-delta text-green">▼ -2.3pp</div>
+  </div>
+</div>
+
+<div class="grid g6 mb">
+  <div class="sm-card" style="border-top-color:var(--muted)">
+    <div class="sm-label">UGC</div>
+    <div class="sm-value">184K</div>
+    <div class="sm-delta text-green">▲ +12.8%</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--red)">
+    <div class="sm-label">Videos</div>
+    <div class="sm-value">28.4K</div>
+    <div class="sm-delta text-green">▲ +41.2%</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--muted)">
+    <div class="sm-label">Non-Social Reach</div>
+    <div class="sm-value">12.6M</div>
+    <div class="sm-delta text-green">▲ +9.4%</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--muted)">
+    <div class="sm-label">Non-Social Mentions</div>
+    <div class="sm-value">342K</div>
+    <div class="sm-delta text-green">▲ +7.6%</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--purple)">
+    <div class="sm-label">Viral Posts</div>
+    <div class="sm-value">1,248</div>
+    <div class="sm-delta text-green">▲ +56%</div>
+  </div>
+  <div class="sm-card" style="border-top-color:var(--cyan)">
+    <div class="sm-label">Avg Engagement</div>
+    <div class="sm-value">4.04%</div>
+    <div class="sm-delta text-green">▲ +1.2pp</div>
+  </div>
+</div>
+
+<div class="card mb">
+  <div class="card-header">📈 Mentions Timeline — Daily Volume</div>
+  <div class="card-body"><div class="chart-wrap" style="height:180px"><canvas id="mentionsTimeline"></canvas></div></div>
+</div>
+
+<div class="grid g-7-5 mb2">
+  <div class="card">
+    <div class="card-header">📡 Social Media Reach — Impressions</div>
+    <div class="card-body"><div class="chart-wrap" style="height:200px"><canvas id="reachTimeline"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">🥧 Platform Contribution — Share of Mentions</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="platformPie"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ POPULAR MENTIONS ═══════════════════════════════ -->
+<hr class="section-divider" />
+<div class="section-header">
+  <div class="section-title">🔥 Top 8 Popular Mentions</div>
+  <div class="section-sub">Most engaged posts across all platforms — sorted by engagement score</div>
+</div>
+<div class="grid g4 mb2" id="popular-mentions"></div>
+
+<!-- ═══════════════════════════════ SM MENTIONS TABLE ═══════════════════════════════ -->
+<div class="section-header">
+  <div class="section-title">📢 Top 14 Social Media Mentions</div>
+  <div class="section-sub">Highest voice share profiles across platforms</div>
+</div>
+<div class="card mb2">
+  <div class="card-body-flush">
+    <table class="rie-table" id="sm-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Handle / Profile</th><th>Platform</th>
+          <th>Followers</th><th>Voice Share</th><th>Engagement</th><th>Trend</th>
+        </tr>
+      </thead>
+      <tbody id="sm-table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ HASHTAGS + INFLUENCERS + ALERTS ═══════════════════════════════ -->
+<hr class="section-divider" />
+<div class="grid g3 mb2">
+  <div class="card">
+    <div class="card-header">🔖 Top Hashtags</div>
+    <div class="card-body" id="hashtag-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-header">⭐ Top Influencers</div>
+    <div class="card-body card-body-flush" id="influencer-list"></div>
+  </div>
+  <div class="card" style="border-color:rgba(248,113,113,.25)">
+    <div class="card-header" style="color:var(--red)">🚨 Live Alerts</div>
+    <div class="card-body" id="alert-feed"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ INFLUENCER INTELLIGENCE ═══════════════════════════════ -->
+<hr class="section-divider" />
+<div class="section-header">
+  <div class="section-title">👥 Influencer Intelligence</div>
+  <div class="section-sub">Top 10 positive &amp; negative sentiment influencers with stance analysis</div>
+  <div class="section-what-it-means">💡 <strong>What this means:</strong> "Positive influencers" are accounts amplifying pro-rally messages. "Negative influencers" are accounts opposing or criticising the rally. The confidence % indicates how certain our AI is about this classification.</div>
+</div>
+
+<div class="grid g2 mb">
+  <div class="card" style="border-color:rgba(52,211,153,.2)">
+    <div class="card-header" style="color:var(--green)">🟢 Top Positive Influencers</div>
+    <div class="card-body-flush" id="pos-inf-table"></div>
+  </div>
+  <div class="card" style="border-color:rgba(248,113,113,.2)">
+    <div class="card-header" style="color:var(--red)">🔴 Top Negative Influencers</div>
+    <div class="card-body-flush" id="neg-inf-table"></div>
+  </div>
+</div>
+
+<div class="grid g2 mb2">
+  <div class="card">
+    <div class="card-header">🟢 Positive Influencer Voice Share</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="posInfPie"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">🔴 Negative Influencer Voice Share</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="negInfPie"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ POLITICAL LEANING ═══════════════════════════════ -->
+<hr class="section-divider" />
+<div class="section-header">
+  <div class="section-title">🏛️ Political Leaning Analysis</div>
+  <div class="section-sub">Influencer &amp; hashtag alignment — BJP, TMC, LEFT, Congress &amp; others</div>
+  <div class="section-what-it-means">💡 <strong>What this means:</strong> This shows which political party the key influencers and trending hashtags are aligned with. It helps you understand the narrative landscape — who controls the conversation and from which political camp.</div>
+</div>
+
+<div class="grid g2 mb">
+  <div class="card">
+    <div class="card-header">Influencer Political Alignment</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="infPartyPie"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">Hashtag Political Alignment</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="htPartyPie"></canvas></div></div>
+  </div>
+</div>
+
+<div class="grid g2 mb">
+  <div class="card">
+    <div class="card-header">🧑‍💼 Influencer Stance Table</div>
+    <div class="card-body-flush">
+      <table class="rie-table" id="inf-stance-tbl">
+        <thead><tr><th>#</th><th>Name</th><th>Party</th><th>Stance</th><th>Confidence</th></tr></thead>
+        <tbody id="inf-stance-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">#️⃣ Hashtag Stance Table</div>
+    <div class="card-body-flush">
+      <table class="rie-table" id="ht-stance-tbl">
+        <thead><tr><th>#</th><th>Hashtag</th><th>Party</th><th>Stance</th><th>Volume</th><th>Conf.</th></tr></thead>
+        <tbody id="ht-stance-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card mb2">
+  <div class="card-header">📊 Party-wise Sentiment — Positive vs Negative per Party</div>
+  <div class="card-body"><div class="chart-wrap" style="height:220px"><canvas id="partySentBar"></canvas></div></div>
+</div>
+
+</div><!-- /page -->
+
+<!-- ═══════════════════════════════ JS ═══════════════════════════════ -->
+<script>
+// ── LIVE CLOCK ──────────────────────────────────────────────────────
+function tick() {
+  const now = new Date();
+  document.getElementById('live-clock').textContent =
+    now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const monNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('live-date').textContent =
+    'IST \u2022 ' + dayNames[now.getDay()] + ' ' + now.getDate() + ' ' + monNames[now.getMonth()] + ' ' + now.getFullYear();
+}
+tick(); setInterval(tick, 1000);
+
+// ── CHART DEFAULTS ──────────────────────────────────────────────────
+Chart.defaults.color = '#64748B';
+Chart.defaults.font.family = "'Inter','Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.padding = 10;
+
+const GRID_COLOR = 'rgba(255,255,255,0.05)';
+
+function ctx(id) { return document.getElementById(id).getContext('2d'); }
+
+// ── SENTIMENT PIE ──────────────────────────────────────────────────
+const sentimentPieChart = new Chart(ctx('sentimentPie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Positive','Neutral','Negative'],
+    datasets: [{ data: [62.4, 15.8, 21.8],
+      backgroundColor: ['#34D399','#64748B','#F87171'],
+      borderColor: '#111C30', borderWidth: 3, hoverOffset: 8 }]
+  },
+  options: { plugins: { legend: { position: 'bottom' } }, cutout: '68%' }
+});
+
+// ── EMOTION BAR ──────────────────────────────────────────────────
+const emotionBarChart = new Chart(ctx('emotionBar'), {
+  type: 'bar',
+  data: {
+    labels: ['Joy','Admiration','Surprise','Anger','Sadness','Fear','Disgust'],
+    datasets: [{ data: [28.4, 22.6, 11.2, 9.8, 7.4, 5.1, 3.9],
+      backgroundColor: ['#34D399','#38BDF8','#FBBF24','#F87171','#A78BFA','#64748B','#EC4899'],
+      borderRadius: 5, borderSkipped: false }]
+  },
+  options: {
+    indexAxis: 'y', plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: GRID_COLOR }, ticks: { callback: v => v+'%' } },
+               y: { grid: { display: false } } }
+  }
+});
+
+// ── PLATFORM BAR ──────────────────────────────────────────────────
+const platformBarChart = new Chart(ctx('platformBar'), {
+  type: 'bar',
+  data: {
+    labels: ['Twitter/X','Facebook','YouTube','News','Instagram','Reddit','Telegram'],
+    datasets: [{ data: [38.2, 18.4, 14.6, 12.8, 8.9, 4.6, 2.5],
+      backgroundColor: ['#1DA1F2','#4267B2','#FF0000','#F39C12','#E1306C','#FF4500','#26A5E4'],
+      borderRadius: 5, borderSkipped: false }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: { y: { grid: { color: GRID_COLOR }, ticks: { callback: v => v+'%' } },
+               x: { grid: { display: false } } }
+  }
+});
+
+// ── ADV SENTIMENT PIE ──────────────────────────────────────────────
+const advData = { Admiration:48.2, Neutral:30.4, Joy:5.6, Hope:4.2, Sarcasm:2.8, Anger:2.4, Surprise:2.1, Disgust:2.0, Sadness:1.4, Fear:0.9 };
+const advColors = { Admiration:'#C8963E', Neutral:'#8E8E8E', Joy:'#D4D455', Hope:'#52B788', Sarcasm:'#B5838D', Anger:'#E63946', Surprise:'#F4A261', Disgust:'#2A9D8F', Sadness:'#457B9D', Fear:'#6D597A' };
+const advSentimentPieChart = new Chart(ctx('advSentimentPie'), {
+  type: 'doughnut',
+  data: {
+    labels: Object.keys(advData),
+    datasets: [{ data: Object.values(advData),
+      backgroundColor: Object.keys(advData).map(k => advColors[k]),
+      borderColor: '#111C30', borderWidth: 2, hoverOffset: 6 }]
+  },
+  options: { plugins: { legend: { position: 'right' } }, cutout: '60%' }
+});
+
+// ── SENTIMENT BREAKDOWN PANEL ──────────────────────────────────────
+const advEmojis = { Admiration:'👍', Neutral:'😐', Joy:'😊', Hope:'🌟', Sarcasm:'😏', Anger:'😡', Surprise:'😮', Disgust:'🤢', Sadness:'😢', Fear:'😨' };
+const breakdownEl = document.getElementById('sentiment-breakdown');
+Object.entries(advData).forEach(([k,v]) => {
+  const row = document.createElement('div');
+  row.className = 'sent-row';
+  row.innerHTML = `
+    <span class="sent-emoji">${advEmojis[k]}</span>
+    <span class="sent-label">${k}</span>
+    <div class="sent-bar-wrap"><div class="sent-bar" style="width:${v}%;background:${advColors[k]}"></div></div>
+    <span class="sent-pct">${v}%</span>`;
+  breakdownEl.appendChild(row);
+});
+
+// ── SENTIMENT TIMELINE ──────────────────────────────────────────────
+const days = (function(){ const d=[],now=new Date(); for(let i=6;i>=0;i--){ const t=new Date(now); t.setDate(now.getDate()-i); d.push(t.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][t.getMonth()]); } return d; })();
+const sentTimelineChart = new Chart(ctx('sentTimeline'), {
+  type: 'line',
+  data: {
+    labels: days,
+    datasets: [
+      { label:'Positive', data:[54,58,56,60,59,64,62.4], borderColor:'#34D399', backgroundColor:'rgba(52,211,153,.08)', tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#34D399' },
+      { label:'Neutral',  data:[22,20,21,18,17,17,15.8], borderColor:'#64748B', backgroundColor:'rgba(100,116,139,.05)', tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#64748B' },
+      { label:'Negative', data:[24,22,23,22,24,19,21.8], borderColor:'#F87171', backgroundColor:'rgba(248,113,113,.06)', tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#F87171' }
+    ]
+  },
+  options: { plugins:{ legend:{ position:'top' }},
+    scales:{ y:{ grid:{color:GRID_COLOR}, ticks:{callback:v=>v+'%'} }, x:{ grid:{color:GRID_COLOR} } } }
+});
+
+// ── EMOTION RADAR ──────────────────────────────────────────────────
+const emotionRadarChart = new Chart(ctx('emotionRadar'), {
+  type: 'radar',
+  data: {
+    labels: ['Joy','Admiration','Hope','Surprise','Neutral','Sarcasm','Anger','Disgust','Sadness','Fear'],
+    datasets: [
+      { label:'Today',      data:[28.4,48.2,4.2,2.1,30.4,2.8,2.4,2.0,1.4,0.9], borderColor:'#38BDF8', backgroundColor:'rgba(56,189,248,.15)', pointBackgroundColor:'#38BDF8' },
+      { label:'Yesterday',  data:[22,42,3.8,2.5,34,3.5,3.2,2.8,2.1,1.2], borderColor:'#A78BFA', backgroundColor:'rgba(167,139,250,.1)', pointBackgroundColor:'#A78BFA' }
+    ]
+  },
+  options: {
+    plugins:{ legend:{ position:'top' }},
+    scales:{ r:{ grid:{color:GRID_COLOR}, ticks:{display:false}, pointLabels:{color:'#94A3B8',font:{size:10}} } }
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════
+// ═══════════ BOT ACTIVITY CHARTS ═════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════
+
+// ── BOT INCLINATION PIE ──────────────────────────────────────────────
+const botInclinationPieChart = new Chart(ctx('botInclinationPie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Pro-BJP / PM Modi', 'Anti-BJP (Opposition)', 'Neutral / Spam'],
+    datasets: [{ data: [42.3, 38.1, 19.6],
+      backgroundColor: ['#FF6B00', '#00BCD4', '#78909C'],
+      borderColor: '#111C30', borderWidth: 3, hoverOffset: 8 }]
+  },
+  options: {
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 14 } },
+      tooltip: {
+        callbacks: {
+          afterLabel: function(context) {
+            const tips = {
+              'Pro-BJP / PM Modi': 'These bots amplify pro-BJP hashtags\nand positive rally narratives',
+              'Anti-BJP (Opposition)': 'These bots spread negative content\nagainst BJP/PM Modi',
+              'Neutral / Spam': 'Automated accounts with no\nclear political agenda'
+            };
+            return tips[context.label] || '';
+          }
+        }
+      }
+    },
+    cutout: '62%'
+  }
+});
+
+// ── BOT SENTIMENT PIE ──────────────────────────────────────────────
+const botSentimentPieChart = new Chart(ctx('botSentimentPie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Positive (Pro-BJP/Modi)', 'Negative (Anti-BJP)', 'Negative (Anti-Opposition)', 'Neutral / Spam'],
+    datasets: [{ data: [38.4, 32.6, 12.8, 16.2],
+      backgroundColor: ['#FF6B00', '#00BCD4', '#E53935', '#78909C'],
+      borderColor: '#111C30', borderWidth: 3, hoverOffset: 8 }]
+  },
+  options: {
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } }
+    },
+    cutout: '62%'
+  }
+});
+
+// ── BOT PLATFORM BAR ──────────────────────────────────────────────
+const botPlatformBarChart = new Chart(ctx('botPlatformBar'), {
+  type: 'bar',
+  data: {
+    labels: ['Twitter/X', 'Facebook', 'Instagram', 'YouTube', 'Others'],
+    datasets: [{
+      data: [52.4, 24.1, 11.8, 7.2, 4.5],
+      backgroundColor: ['#1DA1F2', '#4267B2', '#E1306C', '#FF0000', '#78909C'],
+      borderRadius: 6, borderSkipped: false
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: GRID_COLOR }, ticks: { callback: v => v+'%' }, title: { display: true, text: '% of Bot Activity', color: '#64748B', font: { size: 10 } } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── BOT TIMELINE ──────────────────────────────────────────────────
+const botTimelineChart = new Chart(ctx('botTimeline'), {
+  type: 'line',
+  data: {
+    labels: days,
+    datasets: [
+      { label:'Bot Activity %', data:[3.2, 4.1, 4.8, 6.2, 8.7, 14.3, 8.3],
+        borderColor:'#FBBF24', backgroundColor:'rgba(251,191,36,.1)', tension:.4, fill:true,
+        pointRadius:5, pointBackgroundColor:'#FBBF24', borderWidth: 3 },
+      { label:'Pro-BJP Bots', data:[1.4, 1.8, 2.1, 2.8, 3.8, 6.2, 3.5],
+        borderColor:'#FF6B00', backgroundColor:'rgba(255,107,0,.06)', tension:.4, fill:false,
+        pointRadius:3, pointBackgroundColor:'#FF6B00', borderWidth: 2, borderDash:[5,5] },
+      { label:'Anti-BJP Bots', data:[1.2, 1.5, 1.9, 2.4, 3.6, 5.8, 3.2],
+        borderColor:'#00BCD4', backgroundColor:'rgba(0,188,212,.06)', tension:.4, fill:false,
+        pointRadius:3, pointBackgroundColor:'#00BCD4', borderWidth: 2, borderDash:[5,5] },
+    ]
+  },
+  options: {
+    plugins: { legend: { position: 'top' },
+      annotation: {} },
+    scales: {
+      y: { grid: { color: GRID_COLOR }, ticks: { callback: v => v+'%' }, title: { display: true, text: 'Bot Activity %', color: '#64748B', font: { size: 10 } } },
+      x: { grid: { color: GRID_COLOR } }
+    }
+  }
+});
+
+// ── BOT HASHTAG LIST ──────────────────────────────────────────────
+const botHashtags = [
+  { tag: '#ModiGoBack', botPct: 28.4, inclination: 'Anti-BJP', color: '#00BCD4' },
+  { tag: '#BengalRejects', botPct: 24.7, inclination: 'Anti-BJP', color: '#00BCD4' },
+  { tag: '#KhelaHobe', botPct: 19.2, inclination: 'Pro-TMC', color: '#00BCD4' },
+  { tag: '#ModiInKolkata', botPct: 16.8, inclination: 'Pro-BJP', color: '#FF6B00' },
+  { tag: '#BJP4Bengal', botPct: 14.3, inclination: 'Pro-BJP', color: '#FF6B00' },
+  { tag: '#ModiMegaRally', botPct: 11.6, inclination: 'Pro-BJP', color: '#FF6B00' },
+  { tag: '#FakeCrowds', botPct: 32.1, inclination: 'Anti-BJP', color: '#E53935' },
+  { tag: '#BengalRising', botPct: 9.8, inclination: 'Pro-BJP', color: '#FF6B00' },
+];
+const botHtEl = document.getElementById('bot-hashtag-list');
+botHashtags.sort((a,b) => b.botPct - a.botPct);
+botHtEl.innerHTML = botHashtags.map(h => {
+  const severity = h.botPct > 25 ? 'var(--red)' : h.botPct > 15 ? 'var(--amber)' : 'var(--green)';
+  const severityLabel = h.botPct > 25 ? 'HIGH' : h.botPct > 15 ? 'MED' : 'LOW';
+  return `<div class="bot-ht-item">
+    <span class="bot-ht-name">${h.tag}</span>
+    <span class="bot-ht-badge" style="background:${h.color}22;color:${h.color};border:1px solid ${h.color}44">${h.inclination}</span>
+    <div class="bot-bar"><div class="bot-bar-fill" style="width:${Math.min(h.botPct/40*100,100)}%;background:${severity}"></div></div>
+    <span class="bot-ht-pct" style="color:${severity}">${h.botPct}%</span>
+    <span style="font-size:.58rem;font-weight:700;color:${severity};min-width:28px">${severityLabel}</span>
+  </div>`;
+}).join('');
+
+// ── BOT KEY FINDINGS ──────────────────────────────────────────────
+const findings = [
+  { icon: '📊', text: '<strong>8.3% of accounts</strong> analysed show bot-like behaviour — this is <strong style="color:var(--green)">within acceptable range</strong> (alert threshold is 15%).' },
+  { icon: '🟠', text: '<strong style="color:var(--bjp)">Pro-BJP/Modi bots (42.3%)</strong> are the largest bot group — primarily amplifying rally hashtags like #ModiInKolkata and #BJP4Bengal. These bots boost positive sentiment artificially.' },
+  { icon: '🔵', text: '<strong style="color:var(--tmc)">Anti-BJP opposition bots (38.1%)</strong> are running negative campaigns — pushing hashtags like #ModiGoBack and #FakeCrowds. <strong>32.1% of #FakeCrowds posts are from bots</strong>, making it the most bot-infiltrated hashtag.' },
+  { icon: '⚡', text: 'Bot activity <strong style="color:var(--red)">spiked 246% during rally hours</strong> (12 Mar) vs. pre-rally baseline. Both BJP and opposition camps intensified bot deployments simultaneously.' },
+  { icon: '📱', text: '<strong>Twitter/X is the primary battleground</strong> for bot activity (52.4%), followed by Facebook (24.1%). Instagram and YouTube have lower bot penetration.' },
+  { icon: '🔍', text: '<strong>Net impact assessment:</strong> After removing bot-generated content, genuine positive sentiment drops by ~3.2pp (from 62.4% to ~59.2%) — still strongly positive. The core rally support is <strong style="color:var(--green)">organic and genuine</strong>.' },
+];
+const botFindingsEl = document.getElementById('bot-findings');
+botFindingsEl.innerHTML = findings.map(f =>
+  `<div class="bot-finding">
+    <span class="bot-finding-icon">${f.icon}</span>
+    <span class="bot-finding-text">${f.text}</span>
+  </div>`
+).join('');
+
+// ── MENTIONS TIMELINE ──────────────────────────────────────────────
+const mentionsTimelineChart = new Chart(ctx('mentionsTimeline'), {
+  type: 'bar',
+  data: {
+    labels: days,
+    datasets: [
+      { label:'Social',     data:[280000,320000,298000,410000,380000,520000,640000], backgroundColor:'rgba(56,189,248,.7)', borderRadius:4 },
+      { label:'Non-Social', data:[42000,48000,44000,62000,56000,78000,96000], backgroundColor:'rgba(167,139,250,.7)', borderRadius:4 },
+    ]
+  },
+  options: {
+    plugins:{ legend:{ position:'top' }},
+    scales: {
+      x:{ grid:{display:false}, stacked:true },
+      y:{ grid:{color:GRID_COLOR}, stacked:true, ticks:{callback:v=>v>=1000?v/1000+'K':v} }
+    }
+  }
+});
+
+// ── REACH TIMELINE ──────────────────────────────────────────────
+const reachTimelineChart = new Chart(ctx('reachTimeline'), {
+  type: 'line',
+  data: {
+    labels: days,
+    datasets: [
+      { label:'Reach (M)', data:[18.2,21.4,20.1,24.6,22.8,30.5,38.2], borderColor:'#34D399', backgroundColor:'rgba(52,211,153,.08)', tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#34D399' }
+    ]
+  },
+  options: {
+    plugins:{ legend:{ display:false }},
+    scales:{ y:{ grid:{color:GRID_COLOR}, ticks:{callback:v=>v+'M'} }, x:{ grid:{color:GRID_COLOR} } }
+  }
+});
+
+// ── PLATFORM PIE ──────────────────────────────────────────────
+const platformPieChart = new Chart(ctx('platformPie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Twitter/X','Facebook','YouTube','News','Instagram','Reddit','Telegram'],
+    datasets: [{ data:[38.2,18.4,14.6,12.8,8.9,4.6,2.5],
+      backgroundColor:['#1DA1F2','#4267B2','#FF0000','#F39C12','#E1306C','#FF4500','#26A5E4'],
+      borderColor:'#111C30', borderWidth:2 }]
+  },
+  options:{ plugins:{ legend:{ position:'right' }}, cutout:'55%' }
+});
+
+// ── POPULAR MENTIONS ──────────────────────────────────────────────
+const mentions = [
+  { text:"Massive turnout at Modi rally in Kolkata — the energy is unreal!", tags:['#ModiInKolkata','#BJP4Bengal'], src:'twitter.com', dt:'2026-03-13 14:22', eng:45200 },
+  { text:"Historic crowd at Brigade Parade Ground. Bengal is ready for change!", tags:['#ModiMegaRally','#BengalElection2026'], src:'instagram.com', dt:'13:45', eng:38700 },
+  { text:"PM Modi announces major infrastructure push for West Bengal during rally speech", tags:['#ModiInKolkata','#DevForBengal'], src:'ndtv.com', dt:'15:10', eng:32100 },
+  { text:"Opposition calls the rally a 'show of money power' — TMC fires back", tags:['#KhelaHobe','#BengalElection2026'], src:'twitter.com', dt:'16:05', eng:28400 },
+  { text:"Drone footage shows sea of supporters stretching across 3km at Kolkata rally", tags:['#ModiMegaRally'], src:'youtube.com', dt:'14:55', eng:25800 },
+  { text:"Key promises from PM Modi's Kolkata rally: MSP guarantee, job creation, free healthcare", tags:['#BJP4Bengal','#NaMoBengal'], src:'news18.com', dt:'15:30', eng:22300 },
+  { text:"Local leaders join BJP ahead of rally — political realignment in Bengal?", tags:['#BengalPolitics','#BJP4Bengal'], src:'facebook.com', dt:'12:15', eng:18900 },
+  { text:"Bengal students unite in support — youth voter turnout expected to be record high", tags:['#BengalElection2026','#YouthVote'], src:'reddit.com', dt:'11:40', eng:15600 },
+];
+const srcColors = { 'twitter.com':'#1DA1F2','instagram.com':'#E1306C','ndtv.com':'#F39C12','youtube.com':'#FF0000','news18.com':'#FF8C00','facebook.com':'#4267B2','reddit.com':'#FF4500' };
+const pmGrid = document.getElementById('popular-mentions');
+mentions.forEach(m => {
+  const col = document.createElement('div');
+  col.innerHTML = `<div class="mention-card">
+    <div class="mention-source">
+      <span style="width:8px;height:8px;border-radius:50%;background:${srcColors[m.src]||'#64748B'};display:inline-block"></span>
+      <span style="color:${srcColors[m.src]||'#94A3B8'}">${m.src}</span>
+      <span style="margin-left:auto;font-size:.66rem">${m.dt}</span>
+    </div>
+    <div class="mention-text">${m.text}</div>
+    <div class="mention-tags">${m.tags.map(t=>`<span class="mention-tag">${t}</span>`).join('')}</div>
+    <div class="mention-eng">🔥 ${(m.eng/1000).toFixed(1)}K engagements</div>
+  </div>`;
+  pmGrid.appendChild(col);
+});
+
+// ── SM TABLE ──────────────────────────────────────────────────
+const smRows = [
+  ['yashanshu_singh','X / Twitter',73,'1.242%',39900,'↑ +4.2%'],
+  ['BJP4TheNilgiris','X / Twitter',3448,'1.176%',37788,'↑ +2.8%'],
+  ['ai_daytrading','X / Twitter',1380,'0.784%',25200,'↑ +8.1%'],
+  ['MuraliS27','X / Twitter',210,'0.663%',21300,'↑ +1.4%'],
+  ['RockyBhai377','X / Twitter',540,'0.542%',17400,'↑ +3.6%'],
+  ['ajmalkhan_bjp','X / Twitter',198,'0.532%',17100,'↑ +6.2%'],
+  ['aadhi_shiva1718','X / Twitter',37,'0.439%',14100,'↑ +2.1%'],
+  ['annamalai_k','X / Twitter',145000,'0.385%',12400,'→ 0.0%'],
+  ['BengalBJPVoice','Facebook',28000,'0.342%',11000,'↑ +1.8%'],
+  ['ModiForIndia2026','Instagram',52000,'0.298%',9580,'↑ +5.4%'],
+  ['KolkataPulse','X / Twitter',8900,'0.265%',8520,'↑ +3.2%'],
+  ['BengalRisingYouth','Instagram',15000,'0.231%',7430,'↑ +4.8%'],
+  ['PoliticalBengal','YouTube',42000,'0.198%',6370,'↑ +7.2%'],
+  ['DebateIndia','X / Twitter',95000,'0.175%',5630,'→ -0.3%'],
+];
+const smBody = document.getElementById('sm-table-body');
+smRows.forEach(([handle,platform,followers,share,eng,trend],i) => {
+  const tr = document.createElement('tr');
+  const trendColor = trend.startsWith('↑') ? 'var(--green)' : trend.startsWith('↓') ? 'var(--red)' : 'var(--muted)';
+  tr.innerHTML = `
+    <td class="rank">${i+1}</td>
+    <td class="handle">@${handle}</td>
+    <td><span style="font-size:.72rem;color:var(--muted)">${platform}</span></td>
+    <td style="font-variant-numeric:tabular-nums">${followers>=1000?(followers/1000).toFixed(1)+'K':followers}</td>
+    <td style="color:var(--cyan);font-weight:600">${share}</td>
+    <td style="font-variant-numeric:tabular-nums;font-weight:600">${(eng/1000).toFixed(1)}K</td>
+    <td style="color:${trendColor};font-weight:700;font-size:.8rem">${trend}</td>`;
+  smBody.appendChild(tr);
+});
+
+// ── HASHTAGS ──────────────────────────────────────────────────
+const hashtags = [
+  ['#KhelaHobe',5200],['#ModiInKolkata',4820],['#BJP4Bengal',3540],
+  ['#BengalElection2026',3200],['#ModiMegaRally',2890],['#BengalRising',1950],
+  ['#DidiKeBolo',2100],['#NoNRC',1420],['#RedBengal',890],['#CPIMRally',620],
+];
+const htMax = hashtags[0][1];
+const htEl = document.getElementById('hashtag-list');
+htEl.innerHTML = `<div class="ht-list">${hashtags.map(([ht,cnt])=>`
+  <div class="ht-item">
+    <span class="ht-name">${ht}</span>
+    <div class="ht-bar-wrap"><div class="ht-bar-fill" style="width:${(cnt/htMax*100).toFixed(0)}%"></div></div>
+    <span class="ht-count">${cnt>=1000?(cnt/1000).toFixed(1)+'K':cnt}</span>
+  </div>`).join('')}</div>`;
+
+// ── INFLUENCERS ──────────────────────────────────────────────────
+const topInf = [
+  { name:'@BJPBengal', handle:'BJP Bengal Official', score:94, party:'bjp', color:'#FF6B00' },
+  { name:'@annamalai_k', handle:'BJP Tamil Nadu', score:91, party:'bjp', color:'#FF6B00' },
+  { name:'@NaMo_BJP', handle:'National BJP Handle', score:89, party:'bjp', color:'#FF6B00' },
+  { name:'@Dev_Adhikari_', handle:'Actor & BJP Leader', score:87, party:'bjp', color:'#FF6B00' },
+  { name:'@DilipGhoshBJP', handle:'BJP Bengal President', score:85, party:'bjp', color:'#FF6B00' },
+  { name:'@ndtv', handle:'News Coverage', score:78, party:'neutral', color:'#78909C' },
+];
+const initials = s => s.replace('@','').slice(0,2).toUpperCase();
+const infEl = document.getElementById('influencer-list');
+infEl.innerHTML = topInf.map(inf=>`
+  <div class="inf-item">
+    <div class="inf-avatar" style="background:${inf.color}22;color:${inf.color}">${initials(inf.name)}</div>
+    <div>
+      <div class="inf-name">${inf.name}</div>
+      <div class="inf-meta">${inf.handle}</div>
+    </div>
+    <div class="inf-score text-cyan">${inf.score}%</div>
+  </div>`).join('');
+
+// ── ALERTS ──────────────────────────────────────────────────
+const alerts = [
+  { level:'critical', title:'Viral Surge Detected', msg:'#KhelaHobe trending — 5,200 mentions in 1hr. TMC counter-narrative active.', time:'14:58' },
+  { level:'critical', title:'Bot Activity Spike', msg:'Coordinated bot push identified — 1,240 accounts posting simultaneously.', time:'14:31' },
+  { level:'warning', title:'Negative Cluster', msg:'Negative sentiment cluster forming on Facebook — Brigade ground logistics complaints.', time:'13:52' },
+  { level:'warning', title:'Reach Milestone', msg:'Rally reach crossed 25M impressions — 3hrs ahead of forecast.', time:'13:14' },
+  { level:'info', title:'Media Coverage Surge', msg:'12 national news outlets now covering rally live — press sentiment 68% positive.', time:'12:48' },
+  { level:'info', title:'Youth Engagement Up', msg:'18-25 demographic engagement +41% vs. last rally. YouthVote hashtag trending.', time:'11:32' },
+];
+const alertEl = document.getElementById('alert-feed');
+alertEl.innerHTML = alerts.map(a=>`
+  <div class="alert-item alert-${a.level}">
+    <div class="alert-title">${a.level==='critical'?'🔴':a.level==='warning'?'🟡':'🔵'} ${a.title}</div>
+    <div style="font-size:.74rem;color:var(--text);margin:2px 0">${a.msg}</div>
+    <div class="alert-meta">Today ${a.time}</div>
+  </div>`).join('');
+
+// ── POS/NEG INFLUENCER TABLES ──────────────────────────────────────
+const posInf = [
+  { name:'@BJPBengal', party:'BJP', stance:'Strong Support', score:0.94 },
+  { name:'@NaMo_BJP', party:'BJP', stance:'Strong Support', score:0.91 },
+  { name:'Suvendu Adhikari', party:'BJP', stance:'Support', score:0.88 },
+  { name:'@Dev_Adhikari_', party:'BJP', stance:'Support', score:0.82 },
+  { name:'@DilipGhoshBJP', party:'BJP', stance:'Support', score:0.89 },
+  { name:'@RepublicBangla', party:'BJP', stance:'Slight Support', score:0.68 },
+  { name:'@DidiKeBolo', party:'TMC', stance:'Support', score:0.80 },
+  { name:'@AITCofficial', party:'TMC', stance:'Strong Support', score:0.95 },
+  { name:'@CPIMBengal', party:'LEFT', stance:'Strong Support', score:0.92 },
+  { name:'@ndtv', party:'Neutral', stance:'Neutral Coverage', score:0.78 },
+];
+const negInf = [
+  { name:'@AITCofficial', party:'TMC', stance:'Oppose BJP', score:0.95 },
+  { name:'@MamataOfficial', party:'TMC', stance:'Strong Oppose', score:0.93 },
+  { name:'Bengal Farmer Union', party:'LEFT', stance:'Oppose BJP', score:0.72 },
+  { name:'Bengal Against NRC', party:'TMC', stance:'Oppose BJP', score:0.76 },
+  { name:'@ScrollBengal', party:'Others', stance:'Critical of BJP', score:0.67 },
+  { name:'@TheWireBangla', party:'Others', stance:'Critical of BJP', score:0.71 },
+  { name:'@SaugataRoyMP', party:'TMC', stance:'Oppose BJP', score:0.86 },
+  { name:'TMC Youth Congress', party:'TMC', stance:'Oppose BJP', score:0.87 },
+  { name:'Student Federation', party:'LEFT', stance:'Oppose BJP', score:0.85 },
+  { name:'@CPIMBengal', party:'LEFT', stance:'Oppose BJP', score:0.92 },
+];
+const partyClass = {'BJP':'bjp','TMC':'tmc','LEFT':'left','Congress':'inc','Neutral':'neu','Others':'oth'};
+function renderInfTable(el, data) {
+  el.innerHTML = data.map((inf,i)=>`
+    <div class="inf-item">
+      <span class="rank" style="min-width:20px">${i+1}</span>
+      <div class="inf-avatar" style="width:28px;height:28px;font-size:.65rem;background:rgba(56,189,248,.1);color:var(--cyan)">${initials(inf.name)}</div>
+      <div style="flex:1">
+        <div class="inf-name" style="font-size:.78rem">${inf.name}</div>
+        <span class="party-badge pb-${partyClass[inf.party]||'neu'}">${inf.party}</span>
+        <span style="font-size:.68rem;color:var(--muted);margin-left:4px">${inf.stance}</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.85rem;font-weight:800;color:#fff">${(inf.score*100).toFixed(0)}%</div>
+        <div class="conf-bar" style="width:60px"><div class="conf-fill" style="width:${inf.score*100}%;background:linear-gradient(90deg,var(--cyan),var(--purple))"></div></div>
+      </div>
+    </div>`).join('');
+}
+renderInfTable(document.getElementById('pos-inf-table'), posInf);
+renderInfTable(document.getElementById('neg-inf-table'), negInf);
+
+// ── INF PARTY PIES ──────────────────────────────────────────────
+const posInfPieChart = new Chart(ctx('posInfPie'), {
+  type: 'doughnut',
+  data: {
+    labels:['BJP','TMC','LEFT','Neutral'],
+    datasets:[{ data:[55,25,12,8], backgroundColor:['#FF6B00','#00BCD4','#E53935','#78909C'], borderColor:'#111C30', borderWidth:2 }]
+  },
+  options:{ plugins:{ legend:{ position:'right' }}, cutout:'60%' }
+});
+const negInfPieChart = new Chart(ctx('negInfPie'), {
+  type: 'doughnut',
+  data: {
+    labels:['TMC','LEFT','Others'],
+    datasets:[{ data:[58,28,14], backgroundColor:['#00BCD4','#E53935','#9C27B0'], borderColor:'#111C30', borderWidth:2 }]
+  },
+  options:{ plugins:{ legend:{ position:'right' }}, cutout:'60%' }
+});
+
+// ── INF & HT PARTY PIES ──────────────────────────────────────────────
+const infPartyPieChart = new Chart(ctx('infPartyPie'), {
+  type: 'doughnut',
+  data: {
+    labels:['BJP','TMC','LEFT','Neutral','Congress','Others'],
+    datasets:[{ data:[38,28,14,10,5,5], backgroundColor:['#FF6B00','#00BCD4','#E53935','#78909C','#1E88E5','#9C27B0'], borderColor:'#111C30', borderWidth:2 }]
+  },
+  options:{ plugins:{ legend:{ position:'right' }}, cutout:'60%' }
+});
+const htPartyPieChart = new Chart(ctx('htPartyPie'), {
+  type: 'doughnut',
+  data: {
+    labels:['BJP','TMC','LEFT','Neutral','Congress','Others'],
+    datasets:[{ data:[32,35,8,18,4,3], backgroundColor:['#FF6B00','#00BCD4','#E53935','#78909C','#1E88E5','#9C27B0'], borderColor:'#111C30', borderWidth:2 }]
+  },
+  options:{ plugins:{ legend:{ position:'right' }}, cutout:'60%' }
+});
+
+// ── INF STANCE TABLE ──────────────────────────────────────────────
+const infStanceData = [
+  ['@BJPBengal','BJP','Strong Support',0.94],['@NaMo_BJP','BJP','Strong Support',0.91],
+  ['Suvendu Adhikari','BJP','Support',0.88],['@AITCofficial','TMC','Strong Support',0.95],
+  ['@MamataOfficial','TMC','Strong Support',0.93],['TMC Youth Congress','TMC','Support',0.87],
+  ['@CPIMBengal','LEFT','Strong Support',0.92],['Student Federation','LEFT','Support',0.85],
+  ['@ndtv','Neutral','Neutral Coverage',0.78],['@ABPAnanda','Neutral','Neutral Coverage',0.74],
+  ['India Today Bengali','Neutral','Slight BJP Lean',0.65],['@DilipGhoshBJP','BJP','Support',0.89],
+  ['@SaugataRoyMP','TMC','Support',0.86],['Bengal Farmer Union','LEFT','Oppose BJP',0.72],
+  ['@RepublicBangla','BJP','Slight Support',0.68],['@TheWireBangla','Others','Critical of BJP',0.71],
+  ['@ScrollBengal','Others','Critical of BJP',0.67],['@Dev_Adhikari_','BJP','Support',0.82],
+  ['@DidiKeBolo','TMC','Support',0.80],['Bengal Against NRC','TMC','Oppose BJP',0.76],
+];
+const infStanceBody = document.getElementById('inf-stance-body');
+infStanceData.forEach(([name,party,stance,conf],i)=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="rank">${i+1}</td><td class="handle">${name}</td>
+    <td><span class="party-badge pb-${partyClass[party]||'neu'}">${party}</span></td>
+    <td style="font-size:.75rem;color:var(--text)">${stance}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="conf-bar" style="width:60px"><div class="conf-fill" style="width:${conf*100}%;background:linear-gradient(90deg,var(--cyan),var(--purple))"></div></div>
+        <span style="font-size:.72rem;color:var(--text)">${(conf*100).toFixed(0)}%</span>
+      </div>
+    </td>`;
+  infStanceBody.appendChild(tr);
+});
+
+// ── HT STANCE TABLE ──────────────────────────────────────────────
+const htStanceData = [
+  ['#ModiInKolkata','BJP','Pro-BJP Rally',4820,0.96],['#BJP4Bengal','BJP','Pro-BJP Campaign',3540,0.94],
+  ['#ModiMegaRally','BJP','Pro-BJP Event',2890,0.92],['#KhelaHobe','TMC','Pro-TMC Slogan',5200,0.97],
+  ['#DidiKeBolo','TMC','Pro-TMC Campaign',2100,0.91],['#BengalWantsTMC','TMC','Pro-TMC',1650,0.88],
+  ['#BengalElection2026','Neutral','General Election',3200,0.42],['#WestBengalPolls','Neutral','General Election',1800,0.38],
+  ['#NoNRC','TMC','Anti-BJP Policy',1420,0.84],['#RedBengal','LEFT','Pro-LEFT',890,0.90],
+  ['#CPIMRally','LEFT','Pro-LEFT Event',620,0.93],['#CongressForBengal','Congress','Pro-Congress',450,0.86],
+  ['#BengalRising','BJP','Pro-BJP',1950,0.78],['#JokhonDakBe','TMC','Pro-TMC Slogan',980,0.85],
+  ['#BengalRejects','Others','Anti-Establishment',720,0.62],
+];
+const htStanceBody = document.getElementById('ht-stance-body');
+htStanceData.forEach(([ht,party,stance,vol,conf],i)=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="rank">${i+1}</td>
+    <td style="color:var(--cyan);font-weight:600;font-size:.78rem">${ht}</td>
+    <td><span class="party-badge pb-${partyClass[party]||'neu'}">${party}</span></td>
+    <td style="font-size:.74rem;color:var(--text)">${stance}</td>
+    <td style="font-variant-numeric:tabular-nums;font-weight:600">${vol>=1000?(vol/1000).toFixed(1)+'K':vol}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="conf-bar" style="width:50px"><div class="conf-fill" style="width:${conf*100}%;background:linear-gradient(90deg,var(--amber),var(--red))"></div></div>
+        <span style="font-size:.72rem">${(conf*100).toFixed(0)}%</span>
+      </div>
+    </td>`;
+  htStanceBody.appendChild(tr);
+});
+
+// ── PARTY SENTIMENT BAR ──────────────────────────────────────────────
+const partySentBarChart = new Chart(ctx('partySentBar'), {
+  type: 'bar',
+  data: {
+    labels: ['BJP','TMC','LEFT','Congress','Neutral','Others'],
+    datasets: [
+      { label:'Positive', data:[68.4, 42.1, 38.6, 35.2, 58.4, 22.8], backgroundColor:'rgba(52,211,153,.75)', borderRadius:4 },
+      { label:'Neutral',  data:[18.2, 22.4, 28.8, 30.6, 28.2, 32.4], backgroundColor:'rgba(100,116,139,.6)', borderRadius:4 },
+      { label:'Negative', data:[13.4, 35.5, 32.6, 34.2, 13.4, 44.8], backgroundColor:'rgba(248,113,113,.7)', borderRadius:4 },
+    ]
+  },
+  options: {
+    plugins:{ legend:{ position:'top' }},
+    scales:{
+      x:{ grid:{display:false}, stacked:true },
+      y:{ grid:{color:GRID_COLOR}, stacked:true, ticks:{callback:v=>v+'%'} }
+    }
+  }
+});
+
+// ── KPI COUNTER ANIMATION ──────────────────────────────────────────
+function animateCount(el, from, to, suffix='', decimals=0, duration=1200) {
+  const start = performance.now();
+  function update(ts) {
+    const progress = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = from + (to - from) * ease;
+    el.textContent = val.toFixed(decimals) + suffix;
+    if(progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+setTimeout(()=>{
+  animateCount(document.getElementById('kpi-mood'), 60, 74.2, '', 1);
+  animateCount(document.getElementById('kpi-positive'), 50, 62.4, '%', 1);
+  animateCount(document.getElementById('kpi-negative'), 30, 21.8, '%', 1);
+  animateCount(document.getElementById('kpi-bots'), 12, 8.3, '%', 1);
+  animateCount(document.getElementById('kpi-favour'), 55, 71.6, '%', 1);
+}, 400);
+
+// ══════════════════════════════════════════════════════════════════════
+// ═══════════ LIVE DATA FEED ENGINE ══════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════
+
+(function() {
+  // ── Helper: jitter a value within ±range, clamped to [min, max] ──
+  function jitter(val, range, min, max) {
+    const delta = (Math.random() - 0.5) * 2 * range;
+    return Math.min(max, Math.max(min, val + delta));
+  }
+  function jitterArr(arr, range, min, max) {
+    return arr.map(v => jitter(v, range, min || 0, max || 100));
+  }
+
+  // ── Live KPI state ──
+  const kpi = { mood: 74.2, mentions: 2.41, positive: 62.4, negative: 21.8, bots: 8.3, favour: 71.6 };
+
+  // ── Pulse animation on KPI update ──
+  function pulseKPI(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('pulse');
+    void el.offsetWidth; // force reflow
+    el.classList.add('pulse');
+  }
+
+  // ── Update KPI values ──
+  function updateKPIs() {
+    kpi.mood = jitter(kpi.mood, 0.4, 65, 85);
+    kpi.positive = jitter(kpi.positive, 0.3, 55, 72);
+    kpi.negative = jitter(kpi.negative, 0.2, 15, 28);
+    kpi.bots = jitter(kpi.bots, 0.15, 5, 14);
+    kpi.favour = jitter(kpi.favour, 0.3, 62, 82);
+    kpi.mentions = jitter(kpi.mentions, 0.02, 2.0, 3.5);
+
+    document.getElementById('kpi-mood').textContent = kpi.mood.toFixed(1);
+    document.getElementById('kpi-positive').textContent = kpi.positive.toFixed(1) + '%';
+    document.getElementById('kpi-negative').textContent = kpi.negative.toFixed(1) + '%';
+    document.getElementById('kpi-bots').textContent = kpi.bots.toFixed(1) + '%';
+    document.getElementById('kpi-favour').textContent = kpi.favour.toFixed(1) + '%';
+    document.getElementById('kpi-mentions').textContent = kpi.mentions.toFixed(2) + 'M';
+
+    ['kpi-mood','kpi-positive','kpi-negative','kpi-bots','kpi-favour','kpi-mentions'].forEach(pulseKPI);
+  }
+
+  // ── Update sentiment pie ──
+  function updateSentimentPie() {
+    const pos = jitter(kpi.positive, 0.5, 55, 72);
+    const neg = jitter(kpi.negative, 0.3, 15, 28);
+    const neu = Math.max(0, 100 - pos - neg);
+    sentimentPieChart.data.datasets[0].data = [+pos.toFixed(1), +neu.toFixed(1), +neg.toFixed(1)];
+    sentimentPieChart.update('none');
+  }
+
+  // ── Update emotion bar ──
+  function updateEmotionBar() {
+    emotionBarChart.data.datasets[0].data = jitterArr([28.4, 22.6, 11.2, 9.8, 7.4, 5.1, 3.9], 1.2, 1, 40);
+    emotionBarChart.update('none');
+  }
+
+  // ── Update platform bar ──
+  function updatePlatformBar() {
+    platformBarChart.data.datasets[0].data = jitterArr([38.2, 18.4, 14.6, 12.8, 8.9, 4.6, 2.5], 0.8, 1, 50);
+    platformBarChart.update('none');
+  }
+
+  // ── Update adv sentiment pie ──
+  function updateAdvSentiment() {
+    const keys = Object.keys(advData);
+    const vals = keys.map(k => jitter(advData[k], 0.6, 0.3, 55));
+    advSentimentPieChart.data.datasets[0].data = vals.map(v => +v.toFixed(1));
+    advSentimentPieChart.update('none');
+
+    // also update breakdown bars
+    const rows = breakdownEl.querySelectorAll('.sent-row');
+    rows.forEach((row, i) => {
+      const bar = row.querySelector('.sent-bar');
+      const pct = row.querySelector('.sent-pct');
+      if(bar && pct) {
+        bar.style.width = vals[i].toFixed(1) + '%';
+        pct.textContent = vals[i].toFixed(1) + '%';
+      }
+    });
+  }
+
+  // ── Update timeline charts (shift last point) ──
+  function updateTimelines() {
+    // Sentiment timeline
+    sentTimelineChart.data.datasets[0].data[6] = jitter(kpi.positive, 0.6, 55, 72);
+    sentTimelineChart.data.datasets[1].data[6] = jitter(100 - kpi.positive - kpi.negative, 0.4, 10, 25);
+    sentTimelineChart.data.datasets[2].data[6] = jitter(kpi.negative, 0.4, 15, 28);
+    sentTimelineChart.update('none');
+
+    // Bot timeline
+    botTimelineChart.data.datasets[0].data[6] = jitter(kpi.bots, 0.3, 5, 16);
+    botTimelineChart.data.datasets[1].data[6] = jitter(3.5, 0.3, 1, 8);
+    botTimelineChart.data.datasets[2].data[6] = jitter(3.2, 0.3, 1, 8);
+    botTimelineChart.update('none');
+
+    // Mentions timeline
+    mentionsTimelineChart.data.datasets[0].data[6] = jitter(640000, 30000, 500000, 800000);
+    mentionsTimelineChart.data.datasets[1].data[6] = jitter(96000, 5000, 70000, 130000);
+    mentionsTimelineChart.update('none');
+
+    // Reach timeline
+    reachTimelineChart.data.datasets[0].data[6] = jitter(38.2, 1.5, 30, 50);
+    reachTimelineChart.update('none');
+  }
+
+  // ── Update radar ──
+  function updateRadar() {
+    emotionRadarChart.data.datasets[0].data = jitterArr([28.4,48.2,4.2,2.1,30.4,2.8,2.4,2.0,1.4,0.9], 1.5, 0.3, 55);
+    emotionRadarChart.update('none');
+  }
+
+  // ── Update bot pies ──
+  function updateBotPies() {
+    const b1 = jitterArr([42.3, 38.1, 19.6], 0.8, 10, 55);
+    botInclinationPieChart.data.datasets[0].data = b1.map(v => +v.toFixed(1));
+    botInclinationPieChart.update('none');
+
+    const b2 = jitterArr([38.4, 32.6, 12.8, 16.2], 0.6, 5, 50);
+    botSentimentPieChart.data.datasets[0].data = b2.map(v => +v.toFixed(1));
+    botSentimentPieChart.update('none');
+
+    botPlatformBarChart.data.datasets[0].data = jitterArr([52.4, 24.1, 11.8, 7.2, 4.5], 0.5, 2, 60);
+    botPlatformBarChart.update('none');
+  }
+
+  // ── Update party pies ──
+  function updatePartyPies() {
+    platformPieChart.data.datasets[0].data = jitterArr([38.2,18.4,14.6,12.8,8.9,4.6,2.5], 0.5, 1, 50);
+    platformPieChart.update('none');
+
+    posInfPieChart.data.datasets[0].data = jitterArr([55,25,12,8], 1.5, 3, 65);
+    posInfPieChart.update('none');
+
+    negInfPieChart.data.datasets[0].data = jitterArr([58,28,14], 1.5, 5, 70);
+    negInfPieChart.update('none');
+
+    infPartyPieChart.data.datasets[0].data = jitterArr([38,28,14,10,5,5], 1, 2, 50);
+    infPartyPieChart.update('none');
+
+    htPartyPieChart.data.datasets[0].data = jitterArr([32,35,8,18,4,3], 1, 1, 45);
+    htPartyPieChart.update('none');
+
+    // Party sentiment bar
+    partySentBarChart.data.datasets[0].data = jitterArr([68.4, 42.1, 38.6, 35.2, 58.4, 22.8], 1.2, 15, 80);
+    partySentBarChart.data.datasets[1].data = jitterArr([18.2, 22.4, 28.8, 30.6, 28.2, 32.4], 0.8, 10, 40);
+    partySentBarChart.data.datasets[2].data = jitterArr([13.4, 35.5, 32.6, 34.2, 13.4, 44.8], 1.0, 5, 55);
+    partySentBarChart.update('none');
+  }
+
+  // ── Rotate mentions (push new to front) ──
+  const liveMentionPool = [
+    { text:"Breaking: PM Modi receives roaring welcome at Kolkata Brigade Ground!", tags:['#ModiInKolkata','#BJP4Bengal'], src:'twitter.com', eng:52100 },
+    { text:"Crowd estimates: Over 5 lakh supporters gathered — largest rally in Bengal this year", tags:['#ModiMegaRally'], src:'ndtv.com', eng:41200 },
+    { text:"TMC workers stage protest near rally venue; police deploy extra security", tags:['#KhelaHobe','#BengalPolitics'], src:'facebook.com', eng:33400 },
+    { text:"Youth chant 'Modi Modi' — new voter registration surge detected in Bengal", tags:['#YouthVote','#BJP4Bengal'], src:'instagram.com', eng:29800 },
+    { text:"PM Modi: 'Bengal deserves development, not dynasty' — crowd erupts in applause", tags:['#ModiSpeech','#DevForBengal'], src:'twitter.com', eng:47600 },
+    { text:"Live aerial view: Sea of saffron stretches to the horizon at Kolkata rally", tags:['#ModiMegaRally','#BengalRising'], src:'youtube.com', eng:36900 },
+    { text:"CPM leader criticises both BJP and TMC — calls for 'third alternative' in Bengal", tags:['#RedBengal','#CPIMRally'], src:'reddit.com', eng:12400 },
+    { text:"Bengal students debate rally impact — campus polls show BJP gaining ground", tags:['#BengalElection2026','#StudentVoice'], src:'twitter.com', eng:18200 },
+    { text:"Local traders report economic boost from rally — hotels, transport fully booked", tags:['#KolkataRally','#Economy'], src:'news18.com', eng:21700 },
+    { text:"Mamata Banerjee fires back: 'Bengal rejects outsiders' — TMC holds counter rally", tags:['#DidiKeBolo','#KhelaHobe'], src:'twitter.com', eng:39400 },
+    { text:"Security forces on high alert — 15,000 police personnel deployed for PM Modi rally", tags:['#ModiInKolkata','#Security'], src:'ndtv.com', eng:26300 },
+    { text:"NRI community shows massive support — #ModiInKolkata trends globally", tags:['#NRISupport','#ModiInKolkata'], src:'twitter.com', eng:31800 },
+  ];
+  let mentionIdx = 0;
+
+  function rotateMentions() {
+    const grid = document.getElementById('popular-mentions');
+    if(!grid) return;
+    const pick = liveMentionPool[mentionIdx % liveMentionPool.length];
+    mentionIdx++;
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const newEng = jitter(pick.eng, 3000, 5000, 80000);
+    const col = document.createElement('div');
+    col.innerHTML = `<div class="mention-card fade-in">
+      <div class="mention-source">
+        <span style="width:8px;height:8px;border-radius:50%;background:${srcColors[pick.src]||'#64748B'};display:inline-block"></span>
+        <span style="color:${srcColors[pick.src]||'#94A3B8'}">${pick.src}</span>
+        <span style="margin-left:auto;font-size:.66rem">${timeStr}</span>
+      </div>
+      <div class="mention-text">${pick.text}</div>
+      <div class="mention-tags">${pick.tags.map(t=>'<span class="mention-tag">'+t+'</span>').join('')}</div>
+      <div class="mention-eng">\uD83D\uDD25 ${(newEng/1000).toFixed(1)}K engagements</div>
+    </div>`;
+    grid.insertBefore(col, grid.firstChild);
+    // Remove last to keep grid manageable
+    if(grid.children.length > 8) grid.removeChild(grid.lastChild);
+  }
+
+  // ── Rotate alerts ──
+  const liveAlertPool = [
+    { level:'critical', title:'Sentiment Spike', msg:'Positive sentiment surged +2.1pp in last 5 minutes — rally speech resonating.' },
+    { level:'critical', title:'Viral Hashtag', msg:'#ModiMegaRally hit 10K tweets/min — fastest trending in Bengal election cycle.' },
+    { level:'warning', title:'Bot Cluster Detected', msg:'New bot cluster (380 accounts) pushing #FakeCrowds — monitoring escalated.' },
+    { level:'warning', title:'Counter-Narrative Active', msg:'TMC digital team amplifying #BengalRejects — 3,200 coordinated posts detected.' },
+    { level:'info', title:'Engagement Milestone', msg:'Total engagement crossed 50M interactions — 28% above projection.' },
+    { level:'info', title:'Media Expansion', msg:'International coverage detected — BBC, Al Jazeera now reporting on rally.' },
+    { level:'critical', title:'Reach Record', msg:'Rally content impressions exceeded 40M — new all-time record for Bengal political event.' },
+    { level:'warning', title:'Negative Spike', msg:'Negative sentiment micro-spike on Facebook (logistics complaints) — auto-flagged.' },
+    { level:'info', title:'Youth Surge', msg:'18-25 demographic now 34% of total engagement — highest ever recorded.' },
+    { level:'critical', title:'Trending Nationally', msg:'#ModiInKolkata now #1 trending topic across India on Twitter/X.' },
+  ];
+  let alertIdx = 0;
+
+  function rotateAlerts() {
+    const feed = document.getElementById('alert-feed');
+    if(!feed) return;
+    const pick = liveAlertPool[alertIdx % liveAlertPool.length];
+    alertIdx++;
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const div = document.createElement('div');
+    div.className = 'alert-item alert-' + pick.level + ' fade-in';
+    div.innerHTML = `
+      <div class="alert-title">${pick.level==='critical'?'\uD83D\uDD34':pick.level==='warning'?'\uD83D\uDFE1':'\uD83D\uDD35'} ${pick.title}</div>
+      <div style="font-size:.74rem;color:var(--text);margin:2px 0">${pick.msg}</div>
+      <div class="alert-meta">Today ${timeStr}</div>`;
+    feed.insertBefore(div, feed.firstChild);
+    if(feed.children.length > 6) feed.removeChild(feed.lastChild);
+  }
+
+  // ── Update hashtag counts ──
+  function updateHashtags() {
+    const items = document.querySelectorAll('.ht-item');
+    items.forEach(item => {
+      const countEl = item.querySelector('.ht-count');
+      const barEl = item.querySelector('.ht-bar-fill');
+      if(countEl) {
+        const raw = parseFloat(countEl.textContent.replace('K','')) * (countEl.textContent.includes('K') ? 1000 : 1);
+        const newVal = jitter(raw, raw * 0.03, 100, 99000);
+        countEl.textContent = newVal >= 1000 ? (newVal/1000).toFixed(1) + 'K' : Math.round(newVal);
+        if(barEl) barEl.style.width = Math.min(newVal / 5500 * 100, 100).toFixed(0) + '%';
+      }
+    });
+  }
+
+  // ── Update SM table engagement values ──
+  function updateSMTable() {
+    const rows = document.querySelectorAll('#sm-table-body tr');
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if(cells.length >= 6) {
+        // engagement column (index 5)
+        const engCell = cells[5];
+        const raw = parseFloat(engCell.textContent.replace('K','')) * 1000;
+        const newVal = jitter(raw, raw * 0.02, 1000, 999000);
+        engCell.textContent = (newVal/1000).toFixed(1) + 'K';
+      }
+    });
+  }
+
+  // ── MASTER LIVE UPDATE LOOP ──
+  // KPIs update every 3s, charts every 5s, mentions/alerts every 8s
+  let tickCount = 0;
+
+  function liveUpdate() {
+    tickCount++;
+
+    // KPIs — every tick (3s)
+    updateKPIs();
+
+    // Charts — every 2nd tick (6s)
+    if(tickCount % 2 === 0) {
+      updateSentimentPie();
+      updateEmotionBar();
+      updatePlatformBar();
+      updateAdvSentiment();
+      updateRadar();
+    }
+
+    // Timelines — every 3rd tick (9s)
+    if(tickCount % 3 === 0) {
+      updateTimelines();
+      updateBotPies();
+      updatePartyPies();
+    }
+
+    // Mentions & Alerts — every 3rd tick (9s), staggered
+    if(tickCount % 3 === 1) {
+      rotateMentions();
+      updateHashtags();
+      updateSMTable();
+    }
+    if(tickCount % 4 === 0) {
+      rotateAlerts();
+    }
+  }
+
+  // Start live feed after initial animation completes
+  setTimeout(() => setInterval(liveUpdate, 3000), 2000);
+
+})();
+
+</script>
+</body>
+</html>

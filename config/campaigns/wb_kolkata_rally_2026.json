@@ -1,0 +1,30 @@
+{
+  "campaign_id": "wb_2026_kolkata_rally_001",
+  "rally_name": "PM Modi Mega Rally Kolkata",
+  "rally_date": "2026-03-14",
+  "rally_start_time": "2026-03-14T14:00:00+05:30",
+  "rally_end_time": "2026-03-14T17:00:00+05:30",
+  "rally_location": {
+    "venue": "Brigade Parade Ground",
+    "city": "Kolkata",
+    "state": "West Bengal",
+    "geo": {"lat": 22.5467, "lon": 88.3510, "place_name": "Brigade Parade Ground", "state": "West Bengal", "district": "Kolkata"}
+  },
+  "primary_leader": "Narendra Modi",
+  "primary_party": "BJP",
+  "opposition_entities": ["TMC", "Mamata Banerjee", "Abhishek Banerjee", "CPIM", "Congress", "INDIA Alliance"],
+  "monitoring_window": {
+    "pre_start": "2026-03-07T00:00:00+05:30",
+    "post_end": "2026-03-17T23:59:59+05:30"
+  },
+  "languages": ["en", "hi", "bn", "hi-en", "bn-en"],
+  "keyword_corpus_path": "config/keywords/wb_rally_001.json",
+  "taxonomy_path": "config/taxonomy/wb_2026.json",
+  "alert_thresholds_path": "config/alerts/default.json",
+  "report_template_path": "templates/rally_report_v1.jinja2",
+  "team_notify": {
+    "slack_channel": "#wb-rally-warroom",
+    "email_list": ["analyst@mindgen.in", "lead@mindgen.in"],
+    "whatsapp_group_id": ""
+  }
+}

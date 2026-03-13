@@ -1,0 +1,158 @@
+version: '3.8'
+
+# JanPulse AI — Docker Compose
+# Usage: docker-compose up -d
+
+services:
+
+  # ─── PostgreSQL ───
+  postgres:
+    image: postgres:16-alpine
+    container_name: rie-postgres
+    environment:
+      POSTGRES_DB: rally_intelligence
+      POSTGRES_USER: rie_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rie_secure_2026}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rie_admin -d rally_intelligence"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis (Stream Processing) ───
+  redis:
+    image: redis:7-alpine
+    container_name: rie-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+
+  # ─── ClickHouse (Time-Series Analytics) ───
+  clickhouse:
+    image: clickhouse/clickhouse-server:24-alpine
+    container_name: rie-clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - chdata:/var/lib/clickhouse
+    environment:
+      CLICKHOUSE_DB: rally_analytics
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  # ─── MinIO (Object Storage) ───
+  minio:
+    image: minio/minio:latest
+    container_name: rie-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9002:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minio_secret_2026}
+    volumes:
+      - miniodata:/data
+
+  # ─── Grafana (Real-Time Dashboards) ───
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: rie-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-rie_grafana_2026}
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+    volumes:
+      - grafanadata:/var/lib/grafana
+    depends_on:
+      - clickhouse
+      - postgres
+
+  # ─── Apache Superset (Analytical Dashboards) ───
+  superset:
+    image: apache/superset:3.1.1
+    container_name: rie-superset
+    ports:
+      - "8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET:-rie_superset_secret_2026}
+    depends_on:
+      - postgres
+      - redis
+    command: >
+      bash -c "
+        superset db upgrade &&
+        superset fab create-admin --username admin --firstname Admin --lastname RIE --email admin@mindgen.in --password admin &&
+        superset init &&
+        superset run -h 0.0.0.0 -p 8088
+      "
+
+  # ─── JanPulse AI (Main Application) ───
+  rie-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rie-engine
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      CLICKHOUSE_HOST: clickhouse
+      MINIO_ENDPOINT: minio:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+    volumes:
+      - ./config:/app/config
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+    command: python -m engine.orchestrator start --mode pre-rally --interval 300
+
+  # ─── JanPulse AI Dashboard (Web UI) ───
+  rie-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rie-dashboard
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      CLICKHOUSE_HOST: clickhouse
+    ports:
+      - "8050:8050"
+    depends_on:
+      - postgres
+      - redis
+    command: python -m engine.dashboard.server --port 8050
+
+volumes:
+  pgdata:
+  redisdata:
+  chdata:
+  miniodata:
+  grafanadata:
+
+networks:
+  default:
+    name: rie-network

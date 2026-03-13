@@ -1,0 +1,190 @@
+{
+  "corpus_version": "1.0",
+  "last_updated": "2026-03-06",
+  "categories": {
+    "leader_names": {
+      "primary": {
+        "canonical": "Narendra Modi",
+        "variants": {
+          "en": ["Modi", "PM Modi", "Narendra Modi", "NaMo", "Prime Minister Modi"],
+          "hi": ["मोदी", "पीएम मोदी", "नरेंद्र मोदी", "प्रधानमंत्री मोदी"],
+          "bn": ["মোদী", "প্রধানমন্ত্রী মোদী", "নরেন্দ্র মোদী"],
+          "romanised": ["Modiji", "Modi ji", "NaMo", "modiji"]
+        },
+        "sentiment_context": "leader_primary",
+        "search_query_variants": ["Modi", "\"Narendra Modi\"", "NaMo"]
+      },
+      "opposition_leader_1": {
+        "canonical": "Mamata Banerjee",
+        "variants": {
+          "en": ["Mamata", "Mamata Banerjee", "Didi", "CM Mamata", "West Bengal CM"],
+          "hi": ["ममता", "दीदी", "ममता बनर्जी"],
+          "bn": ["মমতা", "দিদি", "মমতা বন্দ্যোপাধ্যায়", "মুখ্যমন্ত্রী"],
+          "romanised": ["Mamata", "Didi", "Mamta", "mamata di"]
+        },
+        "sentiment_context": "opposition_leader"
+      },
+      "opposition_leader_2": {
+        "canonical": "Abhishek Banerjee",
+        "variants": {
+          "en": ["Abhishek Banerjee", "Abhishek", "TMC national general secretary"],
+          "hi": ["अभिषेक बनर्जी", "अभिषेक"],
+          "bn": ["অভিষেক বন্দ্যোপাধ্যায়", "অভিষেক"],
+          "romanised": ["Abhishek", "Abhishek Banerjee"]
+        },
+        "sentiment_context": "opposition_leader"
+      }
+    },
+    "party_names": {
+      "primary_party": {
+        "canonical": "BJP",
+        "variants": {
+          "en": ["BJP", "Bharatiya Janata Party", "saffron party", "NDA"],
+          "hi": ["भाजपा", "भारतीय जनता पार्टी"],
+          "bn": ["বিজেপি", "ভারতীয় জনতা পার্টি"],
+          "romanised": ["BJP", "bhajpa"]
+        }
+      },
+      "opposition_party_1": {
+        "canonical": "TMC",
+        "variants": {
+          "en": ["TMC", "Trinamool", "Trinamool Congress", "All India Trinamool Congress", "AITC"],
+          "hi": ["तृणमूल", "टीएमसी", "तृणमूल कांग्रेस"],
+          "bn": ["তৃণমূল", "টিএমসি", "তৃণমূল কংগ্রেস", "ঘাসফুল"],
+          "romanised": ["TMC", "Trinamool", "trinamul", "grassflower"]
+        }
+      },
+      "opposition_party_2": {
+        "canonical": "CPIM",
+        "variants": {
+          "en": ["CPIM", "CPI(M)", "Communist Party", "Left Front", "Left"],
+          "hi": ["माकपा", "वामपंथी"],
+          "bn": ["সিপিআইএম", "বামফ্রন্ট", "বাম"],
+          "romanised": ["CPIM", "Left", "communist"]
+        }
+      }
+    },
+    "rally_keywords": {
+      "rally_terms": {
+        "variants": {
+          "en": ["rally", "mega rally", "public meeting", "election rally", "campaign rally", "Brigade rally"],
+          "hi": ["रैली", "महारैली", "जनसभा", "चुनावी रैली", "सभा"],
+          "bn": ["র‍্যালি", "জনসভা", "মহাসভা", "নির্বাচনী সভা", "ব্রিগেড"],
+          "romanised": ["rally", "janasabha", "mahasabha", "brigade rally", "sabha"]
+        }
+      },
+      "hashtags": [
+        "#ModiInKolkata", "#KolkataRally", "#ModiMegaRally", "#BJP4Bengal",
+        "#KhelaHobe", "#BrigadeRally", "#WestBengalElection", "#BengalElection2026",
+        "#ModiInBengal", "#BJPBengal", "#TMCvsBJP", "#BengalWantsModi",
+        "#DidiVsModi", "#AbkiBaarModiSarkar", "#BengalMeinBJP"
+      ]
+    },
+    "issues": {
+      "employment": {
+        "canonical": "Employment and Jobs",
+        "topic_code": "TOP_JOBS",
+        "variants": {
+          "en": ["jobs", "unemployment", "employment", "recruitment", "job creation", "MSME"],
+          "hi": ["रोजगार", "बेरोजगारी", "नौकरी", "भर्ती"],
+          "bn": ["কর্মসংস্থান", "বেকারত্ব", "চাকরি", "নিয়োগ"],
+          "romanised": ["rozgar", "berojgari", "naukri", "chakri", "bekarotto"]
+        }
+      },
+      "development": {
+        "canonical": "Development and Infrastructure",
+        "topic_code": "TOP_DEV",
+        "variants": {
+          "en": ["development", "infrastructure", "roads", "metro", "smart city", "housing"],
+          "hi": ["विकास", "सड़क", "बुनियादी ढांचा"],
+          "bn": ["উন্নয়ন", "পরিকাঠামো", "রাস্তা", "মেট্রো"],
+          "romanised": ["vikas", "unnayan", "unnoyon", "infrastructure", "road"]
+        }
+      },
+      "corruption": {
+        "canonical": "Corruption and Governance",
+        "topic_code": "TOP_CORR",
+        "variants": {
+          "en": ["corruption", "scam", "syndicate raj", "cut money", "extortion", "tolabaji"],
+          "hi": ["भ्रष्टाचार", "घोटाला", "कट मनी"],
+          "bn": ["দুর্নীতি", "কাটমানি", "তোলাবাজি", "সিন্ডিকেট রাজ"],
+          "romanised": ["bhrashtachar", "corruption", "cut money", "tolabaji", "syndicate raj", "durniti"]
+        }
+      },
+      "women_welfare": {
+        "canonical": "Women and Social Welfare",
+        "topic_code": "TOP_WOMEN",
+        "variants": {
+          "en": ["women safety", "Lakshmir Bhandar", "welfare scheme", "Ujjwala"],
+          "hi": ["महिला सुरक्षा", "कल्याण योजना"],
+          "bn": ["মহিলা সুরক্ষা", "লক্ষ্মীর ভান্ডার", "কল্যাণ প্রকল্প"],
+          "romanised": ["Lakshmir Bhandar", "nari suraksha", "welfare", "mahila"]
+        }
+      },
+      "identity_culture": {
+        "canonical": "Identity and Cultural Politics",
+        "topic_code": "TOP_IDENT",
+        "variants": {
+          "en": ["Hindu", "Muslim", "Bengali identity", "sonar bangla", "culture", "language"],
+          "hi": ["हिंदू", "मुस्लिम", "बंगाली पहचान"],
+          "bn": ["হিন্দু", "মুসলিম", "বাঙালি", "সোনার বাংলা", "সংস্কৃতি"],
+          "romanised": ["Hindu", "Muslim", "Bangali", "sonar bangla", "identity"]
+        }
+      },
+      "law_order": {
+        "canonical": "Law and Order",
+        "topic_code": "TOP_LAW",
+        "variants": {
+          "en": ["violence", "Sandeshkhali", "political violence", "safety", "law and order"],
+          "hi": ["हिंसा", "राजनीतिक हिंसा", "कानून व्यवस्था"],
+          "bn": ["হিংসা", "সন্দেশখালি", "রাজনৈতিক হিংসা", "আইনশৃঙ্খলা"],
+          "romanised": ["hinsa", "Sandeshkhali", "violence", "political violence"]
+        }
+      }
+    },
+    "slogans": {
+      "pro_bjp": {
+        "variants": {
+          "en": ["Jai Shri Ram", "Ab ki baar Modi sarkar", "One nation one election", "Sabka saath sabka vikas"],
+          "hi": ["जय श्री राम", "अबकी बार मोदी सरकार", "सबका साथ सबका विकास"],
+          "bn": ["জয় শ্রীরাম"],
+          "romanised": ["Jai Shri Ram", "Abki baar Modi sarkar", "JSR", "sabka saath"]
+        }
+      },
+      "pro_tmc": {
+        "variants": {
+          "en": ["Khela Hobe", "Joy Bangla", "Bengal will not accept outsiders"],
+          "hi": ["खेला होबे"],
+          "bn": ["খেলা হবে", "জয় বাংলা", "বাংলা নিজের মেয়েকেই চায়"],
+          "romanised": ["Khela Hobe", "Joy Bangla", "khela hobe", "bangla nijer meyekei chay"]
+        }
+      }
+    },
+    "sentiment_markers": {
+      "positive_rally": {
+        "variants": {
+          "en": ["massive crowd", "historic rally", "unprecedented turnout", "amazing speech", "thunderous response", "sea of people"],
+          "hi": ["जबरदस्त रैली", "शानदार", "जनता का सैलाब", "ऐतिहासिक", "अद्भुत"],
+          "bn": ["বিশাল জনসভা", "ঐতিহাসিক", "জনতার ঢল", "অসাধারণ"],
+          "romanised": ["jabardast", "goat rally", "shandar", "janatar sailab", "historic", "amazing"]
+        }
+      },
+      "negative_rally": {
+        "variants": {
+          "en": ["flop rally", "empty chairs", "paid crowd", "low turnout", "boring speech", "waste of time", "all talk no action"],
+          "hi": ["फ्लॉप शो", "खाली कुर्सियां", "किराये की भीड़", "जुमला", "झूठा वादा"],
+          "bn": ["ফ্লপ র‍্যালি", "খালি চেয়ার", "ভাড়া করা জনতা", "মিথ্যা প্রতিশ্রুতি"],
+          "romanised": ["flop rally", "khali chair", "bhara crowd", "jumla", "boring", "khaali"]
+        }
+      },
+      "sarcasm_indicators": {
+        "variants": {
+          "en": ["wow what development", "sure right", "as if", "yeah right", "totally believe that"],
+          "hi": ["वाह क्या विकास", "अच्छे दिन आ गए", "बिल्कुल", "हां हां"],
+          "bn": ["বাহ কি উন্নয়ন", "একদম ঠিক", "নিশ্চই"],
+          "romanised": ["waah kya vikas", "acche din", "haan haan", "bilkul", "sure sure"]
+        }
+      }
+    }
+  }
+}
